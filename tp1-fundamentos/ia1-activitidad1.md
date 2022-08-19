@@ -1,8 +1,9 @@
 ### 1) Ejemplos de aplicaciones de inteligencia artificial
 + **OpenWorm**
 Proyecto científico open science para crear el primer organismo virtual mediante computadoras. 
-El espécimen elegido es una lombriz con uno de los sistemas nerviosos más simples (302 neuronas), de manera de que se pueda elaborar el conectoma completo (mapa de las conexiones del cerebro).
-La idea inical fué simular todos los compartimientos de un organismo simple, para así en un futuro demostrar la hipótesis de que mediante computadoras y código es posible simular un sistema nervioso más complejo como el del ser humano.
+El organismo elegido es la lombriz Caenorhabditis elegans. La misma mide apróximadamente 1 mm, y posee uno de los sistemas nerviosos más simples (302 neuronas con cerca de 5500 conexiones), de manera tal que se dispone del conectoma completo (mapa de las conexiones del cerebro). Con solo 1000 células, resuelve problemas básicos como la alimentación, reproducción y evitar depredadores. A pesar de que el gusano está bien estudiado en biología, una comprensión profunda y basada en principios de la bilogía de este organismo sigue siendo difícil de alcanzar.
+La idea inicial fué simular todos los compartimientos de esta lombriz mediante computadoras y código, esto utilizando datos derivados de experimentos científicos llevados a cabo durante la última década. 
+El proyecto OpenWorm ofrece el [código en GitHub](https://github.com/openworm/OpenWorm)
   <br />
   <br />
   [openworm.org](https://openworm.org/)
