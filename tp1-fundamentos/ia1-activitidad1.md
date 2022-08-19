@@ -7,7 +7,7 @@ La idea inical fué simular todos los compartimientos de un organismo simple, pa
   <br />
   [openworm.org](https://openworm.org/)
   <br />
-  [A worm is our best bet to unlock the secrets of the brain | Stephen Larson | TEDxBangalore](https://www.youtube.com/watch?v=RY2-0-QsuTE&ab_channel=TEDxTalks)
+  YouTube Link: [A worm is our best bet to unlock the secrets of the brain | Stephen Larson | TEDxBangalore](https://www.youtube.com/watch?v=RY2-0-QsuTE&ab_channel=TEDxTalks)
 
 + **MuseNet**
 Deep Neural Network la cual puede generar música (rítmo, melodía, armonía) con diferentes instrumentos (excluyendo la voz). Se entreno con colecciones de archivos MIDI de diferentes estilos musicales, entre ellos jazz, pop, estilos africanos, estilos indios, y más.
