@@ -23,5 +23,3 @@ Capacidad de:
 
 ### 4) ¿Qué se entiende por artificial?
 Creado por el ser humano.
-
-
