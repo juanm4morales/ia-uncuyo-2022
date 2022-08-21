@@ -79,7 +79,7 @@ Algunas definiciones de inteligencia artificial:
 
 ### 3) ¿Que se entiende por Inteligencia?
 Capacidad de:
-- Recibir información mediante estímulos (sonido, luz, presión, electricidad), responder a estos estimulos, aprender y crear nuevo conocimiento a partir de esta información.
+- Recibir información mediante estímulos (sonido, luz, presión, electricidad), responder a estos estimulos mediante razonamiento, generar aprendizaje y crear nuevo conocimiento a partir de esta información.
 
 ### 4) ¿Qué se entiende por artificial?
 Característica que posee un objeto al ser creado por el ser humano y que no es encontrado de forma natural.
