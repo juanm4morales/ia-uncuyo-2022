@@ -45,7 +45,7 @@ Tiene dos modos de generar música: un modo simple, y otro avanzado. En el **mod
 
 MuseNet genera cada nota calculando las probabilidades de todas las notas e instrumentos posibles. El modelo cambia para hacer que sus elecciones de instrumentos sean más probables, pero siempre existe la posibilidad de que elija otra cosa. Una dificultad a la que se enfrenta es a la ahora de hacer combinaciones extrañas de estilos instrumentos (como Chopin con bajo y batería). Estas combinaciones suenan poco naturales.
 
-En el momento de la generación, podemos condicionar el modelo para crear muestras en un estilo elegido al comenzar con una entrada tal como: [Rachmaninoff Piano (Soundcloud)](https://soundcloud.com/openai_audio/rachmaninoff?in=openai_audio/sets/musenet).  
+En el momento de la generación, podemos condicionar el modelo para crear muestras en un estilo elegido al comenzar con una entrada tal como: ["Jazz Piano-Bass-Drums" (Soundcloud)](https://soundcloud.com/openai_audio/jazz-trio?in=openai_audio/sets/musenet).  
 
 MuseNet utiliza los kernels de recálculo y optimizados de [Sparse Transformer](https://openai.com/blog/sparse-transformer/) (red neuronal para predicción de lo que sigue en una secuencia, ya sea de texto, imágenes o sonido) para entrenar una red de 71 capas con 24 cabezas de atención.
 
