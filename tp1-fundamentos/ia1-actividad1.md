@@ -59,7 +59,7 @@ Otro proyecto de OpenAI, orientado a la composición de piezas musicales, es [Ju
 
 ### 2) ¿Qué se entiende por inteligencia artificial?  
 
-Yo entiendo el concepto de inteligencia artificial como al conjunto de capacidades observables que tiene un objeto no vivo (físico o virtual)creado por el ser humano, tales como: reconocer datos, tomar decisiones y aprender de ellos, y generar nueva información a partir de estos datos (entradas) y de su retroalimentación.
+Entiendo por inteligencia artificial, a un conjunto de capacidades observables, que tiene un objeto no vivo (físico o virtual) creado por el ser humano. Estas capacidades son: reconocer datos (entrada), tomar decisiones y aprender en base a estos, y generar nueva información (salida) a partir de estos datos y de su retroalimentación.
 
 
 ![](https://carpentries-incubator.github.io/machine-learning-librarians-archivists/fig/ep-02-ai-graph.png)  
