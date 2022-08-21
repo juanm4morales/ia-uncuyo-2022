@@ -2,11 +2,11 @@
 ### **OpenWorm**  
 Proyecto científico open source para crear el primer organismo virtual mediante computadoras. Este fué inicialmente impulsado gracias a una exitosa campaña de kickstarter. Está liderado por Stephen Larson, CEO de MetaCell, compañia que desarrolla software aplicado a neurociencias.  
 
-El organismo elegido es la lombriz Caenorhabditis elegans. El mismo mide apróximadamente 1 mm, y posee uno de los sistemas nerviosos más simples (302 neuronas con cerca de 5500 conexiones), debido a esto se dispone del conectoma completo (mapa de las conexiones del cerebro). Con solo 1000 células, resuelve problemas básicos como la alimentación, reproducción y evitar depredadores. A pesar de que el gusano está bien estudiado en biología, una comprensión profunda y basada en principios de la bilogía de este organismo sigue siendo difícil de alcanzar.  
+El organismo elegido es la lombriz Caenorhabditis elegans. El mismo mide apróximadamente 1 mm, y posee uno de los sistemas nerviosos más simples (302 neuronas con cerca de 5500 conexiones), debido a esto se dispone del conectoma completo (mapa de las conexiones del cerebro). Con solo 1000 células, resuelve problemas básicos como la alimentación, reproducción y evitar depredadores. A pesar de que el gusano está bien estudiado en biología, una comprensión profunda de la biología de este organismo sigue siendo difícil de alcanzar.  
 
 ![OpenWorm](https://d.ibtimes.co.uk/en/full/1420989/worm-connectome-openworm.jpg?w=600&f=36151e18593fe6065f80e079b17c7a10)
 
-La idea inicial fué simular todos los compartimientos de esta lombriz mediante computadoras y código, esto utilizando datos derivados de experimentos científicos llevados a cabo durante la última década. El objetivo secundario es permitir, a través de simulación, experimentos in-silico sin precedentes de células vivas para impulsar la próxima generación de análisis de sistemas biológicos avanzados, biología sintética, descubrimiento de fármacos utilizando computación, y modelado dinámico de enfermedades.
+La idea inicial fué simular todos los compartimientos de esta lombriz mediante computadoras y código; esto, utilizando datos derivados de experimentos científicos, llevados a cabo durante la última década. El objetivo secundario es permitir, a través de simulación, experimentos in-silico sin precedentes de células vivas para impulsar la próxima generación de análisis de sistemas biológicos avanzados, biología sintética, descubrimiento de fármacos utilizando computación, y modelado dinámico de enfermedades.
 
 
 Las principales áreas del proyecto son:  
