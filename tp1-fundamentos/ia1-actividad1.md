@@ -6,7 +6,7 @@ El organismo elegido es la lombriz Caenorhabditis elegans. El mismo mide apróxi
 
 ![OpenWorm](https://d.ibtimes.co.uk/en/full/1420989/worm-connectome-openworm.jpg?w=600&f=36151e18593fe6065f80e079b17c7a10)
 
-La idea inicial fué simular todos los compartimientos de esta lombriz mediante computadoras y código, esto utilizando datos derivados de experimentos científicos llevados a cabo durante la última década. El objetivo secundario es permitir, a través de simulación, experimentos in-silico sin precedentes de células vivas para impulsar la próxima generación de análisis de sistemas biológicos avanzados, biología sintética, descubrimiento de fármacos utilizando computación, y modelado dinámico de enfermedades. O
+La idea inicial fué simular todos los compartimientos de esta lombriz mediante computadoras y código, esto utilizando datos derivados de experimentos científicos llevados a cabo durante la última década. El objetivo secundario es permitir, a través de simulación, experimentos in-silico sin precedentes de células vivas para impulsar la próxima generación de análisis de sistemas biológicos avanzados, biología sintética, descubrimiento de fármacos utilizando computación, y modelado dinámico de enfermedades.
 
 
 Las principales áreas del proyecto son:  
@@ -57,11 +57,12 @@ MuseNet ha sido entrenada con una gran recopilación de archivos MIDI de diferen
 
 Otro proyecto de OpenAI, orientado a la composición de piezas musicales, es [Jukebox](https://openai.com/blog/jukebox/). Esta red neuronal genera música como MuseNet, pero lo hace con archivos de audio crudos (wav, mp3, flac, etc), lo cual posibilita más opciones a la hora de componer. El resultado producido por Jukebox tiene menor calidad respecto a MuseNet, ya que la mayoría de las canciones no disponen de todos los canales(instrumentos) de su grabación. Aún así, Jukebox ofrece mayor robustez y por lo tanto posibilidades, una de estas incluye la generación de voces y sus respectivas letras.
 
-### 2) ¿Qué se entiende por inteligencia artificial?
+### 2) ¿Qué se entiende por inteligencia artificial?  
+
 Yo entiendo el concepto de inteligencia artificial como al conjunto de capacidades observables que tiene un objeto no vivo (físico o virtual)creado por el ser humano, tales como: reconocer datos, tomar decisiones y aprender de ellos, y generar nueva información a partir de estos datos (entradas) y de su retroalimentación.
 
 
-![](https://www.researchgate.net/profile/Vladislav-Fomin/publication/333720228/figure/fig2/AS:768920994738179@1560336459851/AI-and-human-non-automated-decision-Source-Koeszegi-2019-referring-to-Agrawal.png)  
+![](https://carpentries-incubator.github.io/machine-learning-librarians-archivists/fig/ep-02-ai-graph.png)  
 
 <br />
 Algunas definiciones de inteligencia artificial:  
