@@ -61,7 +61,7 @@ Otro proyecto de OpenAI, orientado a la composición de piezas musicales, es [Ju
 Yo entiendo el concepto de inteligencia artificial como al conjunto de capacidades observables que tiene un objeto no vivo (físico o virtual)creado por el ser humano, tales como: reconocer datos, tomar decisiones y aprender de ellos, y generar nueva información a partir de estos datos (entradas) y de su retroalimentación.
 
 
-<img src="https://www.researchgate.net/profile/Vladislav-Fomin/publication/333720228/figure/fig2/AS:768920994738179@1560336459851/AI-and-human-non-automated-decision-Source-Koeszegi-2019-referring-to-Agrawal.png" alt="drawing" width="660"/>  
+<img src="https://www.researchgate.net/profile/Vladislav-Fomin/publication/333720228/figure/fig2/AS:768920994738179@1560336459851/AI-and-human-non-automated-decision-Source-Koeszegi-2019-referring-to-Agrawal.png" width="660"/>  
 
 <br />
 Algunas definiciones de inteligencia artificial:  
