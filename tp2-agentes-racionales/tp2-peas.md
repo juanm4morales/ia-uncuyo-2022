@@ -14,4 +14,4 @@
 | Comprador/vendedor tokens crypto | Ganancia neta. |Página web con datos actuales e históricos del valor de criptomonedas | Selección de criptomoneda, comprar/vender X cantidad de la criptomoneda. | Lectura de datos sobre criptomonedas. | 
 | Jugador de tenis | Cantidad de golpes bien ejecutados, velocidad media de la pelota | Espacio con pared de concreto | Rotar raqueta de tenis, dar golpe utilizando vector aceleración | Sensor de visión espacial |
 | Objeto saltarín | Altura alcanzada (en metros) | Espacio con suelo y sin techo | Generador de fuerza vertical hacia arriba mediante vector fuerza  | Medidor de altura |
-| Pujador | Ganancia real | Sala de subastas | Aumentar la puja X cantidad de dinero | Reconocimiento de la puja actual junto a su pujador |
+| Pujador | Ganancia real | Sala de subastas | Aumentar la puja X cantidad de dinero | Reconocimiento de la puja actual junto a su pujador | 
