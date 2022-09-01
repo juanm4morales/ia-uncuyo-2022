@@ -63,7 +63,7 @@ El experimento mental del **cerebro en una cubeta** pone en juicio el punto ante
 <br>
 Este ejemplo parece contradecir la visión de que los estados del cerebro determinan estados mentales. Una forma de resolver este dilema es decir que el contenido de los estados mentales pueden ser interpretados desde dos puntos de vista diferentes. El punto de vista del **"contenido amplio"**, dónde el contenido de los estados mentales implica tanto el estado cerebral como la historia del entorno. El punto de vista del **"contenido estrecho"**, en cambio, sólo considera el estado cerebral. El contenido estrecho de los estados cerebrales de un verdadero comedor de hamburguesas y de un "comedor de hamburguesas" en el cerebro en la cubeta, es el mismo en ambos casos.  
 
-### Funcionalismo y el experimento de reemplazo de cerebro
+### **Funcionalismo y el experimento de reemplazo de cerebro**
 
 La teoría del **funcionalismo** dice que un estado mental es cualquier condición causal intermedia entre la entrada y la salida. Dos sistemas cualesquiera con procesos causales isomórficos tendrían los mismos estados mentales.  
 
@@ -91,7 +91,7 @@ Hasta aquí, todo bien. Pero desde el exterior, vemos un sistema que recibe info
 
 La **conciencia** se suele dividir en aspectos como la comprensión y la autoconciencia. El aspecto en el que nos enfocaremos es el de la *experiencia subjetiva*: por qué se *siente* algo al tener ciertos estados cerebrales (por ejemplo, al comer una hamburguesa), mientras que presumiblemente no se siente nada al tener otros estados físicos (por ejemplo, al ser una roca). El término técnico para referirse a la naturaleza intrínseca de la experiencias es **qualia** (del latín, "tales cosas").  
 
-Es difícil explicar cómo las popiedades físicas dan lugar a la manera en que las cosas se sienten bajo la experiencia subjetiva. A esta dificultad se la conoce como **brecha explicativa**. El comportamiento de una computadora puede explicarse adecuadamente solo pos sus componentes físicos, en este caso no existe tal brecha.
+Es difícil explicar cómo las propiedades físicas dan lugar a la manera en que las cosas se sienten bajo la experiencia subjetiva. A esta dificultad se la conoce como **brecha explicativa**. El comportamiento de una computadora puede explicarse adecuadamente solo pos sus componentes físicos, en este caso no existe tal brecha.
 
 ![](https://qph.cf2.quoracdn.net/main-qimg-c4dc3af406c851a11f46b801eae9ea05.webp)
 
@@ -124,4 +124,9 @@ Si bien hasta el momento solo hemos desarrollado IA débil, esta es muy importan
 
 Es importante determinar que características debe tener una IA, por lo tanto, lograr una definición. A lo largo de la historia se han hecho varias preguntas como: ¿que es la mente?, ¿esta debe estar asociada a un cuerpo?, ¿la inteligencia se puede determinar externamente?, si solo se puede determinar internamente ¿como lo hacemos en humanos?. Otro debate filósofico es sobre ¿como se observa la consciencia?, y si esta debe estar presente en la IA. La consciencia puede no ser más que una característica adicional, la cual es muy díficil de entender formalmente, y por lo tanto de implementar artificialmente. Estos debates y preguntas, por más que pertenezcan más a la filosofía, son interesantes de leer, ya que acompañan al conocimiento técnico y científico.  
 
-Todo software que construimos, posiblemente termine interactuando con personas, de forma directa o indirecta. Hay casos en los que quizás no es interesante analizar el impacto que tendrá nuestro software, pero otros más críticos si lo son. Como puede ser, por ejemplo, un sofware que maneje un dispositivo de radioterapia. Con software que utiliza IA sucede el mismo problema ético, con el añadido de nuevos planteamientos.  
+Todo software que construimos, posiblemente termine interactuando con personas, de forma directa o indirecta. Hay casos en los que quizás no es interesante analizar el impacto que tendrá nuestro software, pero otros más críticos si lo son. Como puede ser, por ejemplo, un software que maneje un dispositivo de radioterapia. Con software que utiliza IA sucede el mismo problema ético, con el añadido de nuevos planteamientos.  
+
+## Mapa mental
+<br>
+
+![](https://i.imgur.com/TITxONT.png)
