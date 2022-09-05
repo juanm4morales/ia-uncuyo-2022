@@ -87,8 +87,8 @@ class Enviroment:
         
     def is_dirty(self):
         return self.grid[self.agentPosition[1]][self.agentPosition[0]].dirty
- 
-       
+    
+"""
 env = Enviroment(10, 10, 0, 0, 0.8)
 
 env.printGrid()
@@ -109,3 +109,4 @@ print(env.is_dirty())
 env.update_agent((0,0), True)
 env.printGrid()
 
+"""
