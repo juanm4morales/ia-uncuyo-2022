@@ -1,5 +1,5 @@
 import random
- 
+import math
 class Cell:
     def __init__(self):
         self.dirty=False
@@ -14,11 +14,13 @@ class Enviroment:
         self.currentPosX=init_posX
         self.currentPosY=init_posY
         self.dirt_rate=dirt_rate
-        dirty_cells=dirt_rate*sizeX*sizeY
+        self.amountOfDirt=math.ceil(dirt_rate*sizeX*sizeY)
         self.grid: list[list[Cell]] = self.make_grid(sizeX, sizeY)
-        self.dirty_grid(self.grid, dirty_cells)
+        self.dirty_grid()
         self.grid[init_posY][init_posX].agent=True
         self.agentPosition=[init_posX,init_posY]
+        self.cellsCleaned=0
+
                
     def make_grid(self,sizeX,sizeY):
         grid=[]
@@ -29,15 +31,16 @@ class Enviroment:
                 grid[i].append(cell)
         return grid
    
-    def dirty_grid(self, grid : list[list[Cell]], dirty_cells):
-        sizeX=len(grid)
-        sizeY=len(grid[0])
-        while (dirty_cells>0):
+    def dirty_grid(self):
+        sizeX=len(self.grid)
+        sizeY=len(self.grid[0])
+        remainingDirt=self.amountOfDirt
+        while (remainingDirt>0):
             x=random.randint(0, sizeX-1)
             y=random.randint(0, sizeY-1)
-            if not(grid[y][x].dirty):
-                grid[y][x].dirty=True
-                dirty_cells=dirty_cells-1
+            if not(self.grid[y][x].dirty):
+                self.grid[y][x].dirty=True
+                remainingDirt=remainingDirt-1
  
     def print_enviroment(self):
         grid = self.grid
@@ -75,6 +78,7 @@ class Enviroment:
                 return -1
         else:
             self.grid[self.agentPosition[1]][self.agentPosition[0]].dirty=False
+            self.cellsCleaned+=1
             return 0
                 
     def move_agent(self,x,y):
@@ -88,25 +92,12 @@ class Enviroment:
     def is_dirty(self):
         return self.grid[self.agentPosition[1]][self.agentPosition[0]].dirty
     
-"""
-env = Enviroment(10, 10, 0, 0, 0.8)
+    def get_performance(self,agentLifeTime):
 
-env.printGrid()
-print(env.is_dirty())
-env.update_agent((1,0), False)
-env.update_agent((0,0), True)
-env.printGrid()
-env.update_agent((1,0), False)
-print(env.is_dirty())
-env.update_agent((0,0), True)
-env.printGrid()
-env.update_agent((1,0), False)
-print(env.is_dirty())
-env.update_agent((0,0), True)
-env.printGrid()
-env.update_agent((1,0), False)
-print(env.is_dirty())
-env.update_agent((0,0), True)
-env.printGrid()
-
-"""
+        cleanness=self.cellsCleaned/self.amountOfDirt
+        desired_actions=1000-self.sizeX*self.sizeY+self.amountOfDirt
+        if desired_actions<=0:
+            performance=cleanness*0.8+agentLifeTime/(self.sizeX*self.sizeY+self.amountOfDirt)*0.2
+        else:
+            performance=cleanness
+        return performance

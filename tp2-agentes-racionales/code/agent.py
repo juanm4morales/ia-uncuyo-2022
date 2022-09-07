@@ -2,11 +2,10 @@ from enviroment import Enviroment
 import random
 
 class Agent:
-    
-    
     def __init__(self,enviroment:Enviroment):
         self.enviroment=enviroment
-        self.lifeTime=1000
+        self.initLifeTime=1000
+        self.lifeTime=self.initLifeTime
     
     def up(self):
         self.lifeTime-=1
@@ -51,10 +50,15 @@ class Agent:
         dirtyCell=self.enviroment.is_dirty()
         return (dirtyCell,agentPosition)
     
+    def start(self):
+        self.think()
+
+    # Mediante el método think, el agente supone que se encuentra en una grilla rectangular y recorre esta mediante un barrido de extremo a extremo.
     def think(self):
         
         initialCorner=random.randint(0, 3)
         # 0: TopLeft - 1: TopRight - 2: BottomLeft - 3: BottomRight
+        # Busca una esquina aleatoria, para comenzar el recorrido
         self.search_corner(initialCorner)
         done = False
         if initialCorner==0:
@@ -140,36 +144,61 @@ class Agent:
                     else:
                         done=True
                         break
-            
+    # Busca la esquina indicada, mientrás realiza su tarea de limpieza.
     def search_corner(self,corner):
         if corner==0:
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.left())<0:
                     break
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.up())<0:
                     break                    
                 
         if corner==1:
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.right())<0:
                     break
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.up())<0:
-                    break    
+                    break 
+                   
         if corner==2:
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.left())<0:
                     break
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.down())<0:
                     break    
             
         if corner==3:
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.right())<0:
                     break
             while self.lifeTime>0:
+                if self.enviroment.is_dirty():
+                    self.suck()
+                    continue
                 if (self.down())<0:
                     break
                 
