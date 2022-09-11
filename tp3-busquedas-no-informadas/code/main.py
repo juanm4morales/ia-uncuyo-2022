@@ -20,24 +20,26 @@ def simulation(size, obstacle_rate):
     exploreAmount1=len(agent1.exploredNodes)
     results.append(exploreAmount1)
     env.resetEnviroment()
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
     agent2=agents.Agent(env,"ucs")
     exploreAmount2=len(agent2.exploredNodes)
     results.append(exploreAmount2)
     agent2.think()
     env.resetEnviroment()
+    
     agent3=agents.Agent(env,"dfs")
     exploreAmount3=len(agent3.exploredNodes)
     results.append(exploreAmount3)
     agent3.think()
     env.resetEnviroment()
+    
     agent4=agents.Agent(env,"dls")
     exploreAmount4=len(agent4.exploredNodes)
     results.append(exploreAmount4)
     agent4.think()
     
     return results
-    
+ 
     
 size=100
 n=30

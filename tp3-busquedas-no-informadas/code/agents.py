@@ -6,7 +6,7 @@ import copy
 class Agent:
     def __init__(self,enviroment:Enviroment, strategy:str="bfs"):
         self.enviroment=enviroment
-        self.agentPosition=copy.copy(self.enviroment.agentPosition)
+        self.agentPosition=self.enviroment.agentPosition
         if strategy.lower() == "bfs":
             self.strategy="bfs"
         elif strategy.lower() == "ucs":
@@ -46,7 +46,7 @@ class Agent:
             return False
         print(agentSequence)
         self.startSequence(agentSequence)
-        self.enviroment.print_enviroment()
+        #self.enviroment.print_enviroment()
         return True
     
     def findPath(self) -> list[(int,int)] :
@@ -55,14 +55,14 @@ class Agent:
         init_pos=(self.agentPosition[0],self.agentPosition[1])
         solution:search.Node=None
         if self.strategy=="bfs":
-            solution=search.bfs(grid, init_pos, last_pos,self.exploredNodes)
+            solution=search.bfs(grid, init_pos, last_pos, self.exploredNodes)
         elif self.strategy=="ucs":
-            solution=search.ucs(grid, init_pos, last_pos,self.exploredNodes)
+            solution=search.ucs(grid, init_pos, last_pos, self.exploredNodes)
         elif self.strategy=="dfs":
-            solution=search.dfs(grid, init_pos, last_pos,self.exploredNodes)
+            solution=search.dfs(grid, init_pos, last_pos, self.exploredNodes)
         elif self.strategy=="dls":
             limit = math.ceil(len(grid)*len(grid[0])/2)
-            solution=search.dls(grid, init_pos, last_pos,limit,self.exploredNodes)
+            solution=search.dls(grid, init_pos, last_pos,limit, self.exploredNodes)
         else:
             print("?")
         
@@ -81,3 +81,9 @@ class Agent:
                 path.insert(0, solution.position)
                 solution=solution.parent
             return path
+
+
+env=Enviroment(50, 50, 0, 0, 28, 37, 0.1)
+env.print_enviroment()
+agent=Agent(env,"bfs")
+agent.think()

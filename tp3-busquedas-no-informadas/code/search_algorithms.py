@@ -16,8 +16,9 @@ def bfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
         return node
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
     frontier=[node]
-
+    #explored=set()
     while True:
+        #print(len(explored))
         if len(frontier)==0:
             return None
         node = frontier.pop()
@@ -28,6 +29,7 @@ def bfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
                 child = Node(nextPosition,0, node)
 
                 if nextPosition not in explored and nextPosition not in frontier:
+
                     if nextPosition==last_pos:
                         return child
                     frontier.insert(0, child)
@@ -38,7 +40,7 @@ def ucs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
         return node
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
     frontier:list[(int,Node)]=[(node.cost,node)]
-
+    #explored=set()
     while True:
         if len(frontier)==0:
             return None
@@ -59,6 +61,7 @@ def ucs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
 
 def dls(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,limit:int,explored:set):
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
+    #explored=set()
     return (recursive_dls(grid, actions, Node(init_pos),last_pos,limit,explored))
 
 def recursive_dls(grid:list[list[enviroment.Cell]], actions:list[(int,int)], node:Node, last_pos:tuple, limit:int,explored:set):
@@ -89,6 +92,7 @@ def recursive_dls(grid:list[list[enviroment.Cell]], actions:list[(int,int)], nod
 
 def dfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:set):
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
+    #explored=set()
     return (recursive_dfs(grid, actions, Node(init_pos),last_pos,explored))
 
 def recursive_dfs(grid:list[list[enviroment.Cell]], actions:list[(int,int)], node:Node, last_pos:tuple ,explored:set):
