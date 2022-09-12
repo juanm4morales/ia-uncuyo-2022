@@ -16,9 +16,9 @@ def bfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
         return node
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
     frontier=[node]
-    #explored=set()
+
     while True:
-        #print(len(explored))
+
         if len(frontier)==0:
             return None
         node = frontier.pop()
@@ -28,11 +28,17 @@ def bfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
                 nextPosition=tuple(map(operator.add,node.position, action))
                 child = Node(nextPosition,0, node)
 
-                if nextPosition not in explored and nextPosition not in frontier:
-
+                if nextPosition not in explored and not(inFrontier(nextPosition, frontier)):
                     if nextPosition==last_pos:
                         return child
-                    frontier.insert(0, child)
+                    frontier.insert(0, child)                 
+
+def inFrontier(position, frontier:list[Node]):
+    for i in range(0,len(frontier)):
+        if frontier[i].position==position:
+            return True
+    return False
+    
 
 def ucs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:set):
     node = Node(init_pos,0)
@@ -40,7 +46,7 @@ def ucs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
         return node
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
     frontier:list[(int,Node)]=[(node.cost,node)]
-    #explored=set()
+
     while True:
         if len(frontier)==0:
             return None
@@ -54,23 +60,29 @@ def ucs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:
                 cost=grid[nextPosition[0]][nextPosition[1]].cost
                 child = Node(nextPosition, cost,node)
 
-                if nextPosition not in explored and (cost,nextPosition) not in frontier:
+                if nextPosition not in explored and not(inFrontierC(nextPosition, frontier)):
                     if nextPosition==last_pos:
                         return child
                     frontier.insert(0, (0,child))
 
+def inFrontierC(position, frontier:list[(int,Node)]):
+    for i in range(0,len(frontier)):
+
+        if frontier[i][1].position==position:
+            return True
+    return False
+
+
 def dls(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,limit:int,explored:set):
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
-    #explored=set()
     return (recursive_dls(grid, actions, Node(init_pos),last_pos,limit,explored))
 
 def recursive_dls(grid:list[list[enviroment.Cell]], actions:list[(int,int)], node:Node, last_pos:tuple, limit:int,explored:set):
-    #print(node.position)
+
     explored.add(node.position)
     if node.position==last_pos:
         return node
     elif limit==0:
-
         return 0
     else:
         cutoff_occurred=False
@@ -90,10 +102,33 @@ def recursive_dls(grid:list[list[enviroment.Cell]], actions:list[(int,int)], nod
         else:
             return -1
 
-def dfs(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:set):
+def DFS(grid:list[list[enviroment.Cell]],init_pos:tuple,last_pos:tuple,explored:set):
     actions=[(0,1),(0,-1),(-1,0),(1,0)]
-    #explored=set()
-    return (recursive_dfs(grid, actions, Node(init_pos),last_pos,explored))
+
+    result = DFS_rec(grid, actions, init_pos,last_pos,[],explored)
+
+def DFS_rec(grid:list[list[enviroment.Cell]], actions:list[(int,int)],init_pos:tuple, last_pos:tuple , path:list,explored:set):
+    path.append(init_pos)
+    explored.add(init_pos)
+    if init_pos==last_pos:
+        return path
+    
+    for action in actions:
+        if is_valid(grid, init_pos, action):
+            nextPosition=tuple(map(operator.add,init_pos, action))
+            if nextPosition not in explored:
+                result = DFS_rec(grid, actions, nextPosition, last_pos, path, explored)
+                if result is not None:
+                    return result
+    path.pop()
+    return None
+    
+    
+    
+def dfs(grid:list[list[enviroment.Cell]], actions:list[(int,int)],init_pos:tuple,last_pos:tuple,explored:set):
+    actions=[(0,1),(0,-1),(-1,0),(1,0)]
+    result =  recursive_dfs(grid, actions, Node(init_pos),last_pos,explored)
+    return result
 
 def recursive_dfs(grid:list[list[enviroment.Cell]], actions:list[(int,int)], node:Node, last_pos:tuple ,explored:set):
     explored.add(node.position)

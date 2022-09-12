@@ -3,6 +3,10 @@ import search_algorithms as search
 import string
 import math
 import copy
+
+import sys
+
+sys.setrecursionlimit(100000)
 class Agent:
     def __init__(self,enviroment:Enviroment, strategy:str="bfs"):
         self.enviroment=enviroment
@@ -38,52 +42,64 @@ class Agent:
             self.agentPosition[1]=move[1]
             self.enviroment.update_agent(self.agentPosition)
             
-    
     def think(self):
+        print(self.findPath())
+        """
         agentSequence:list[(int,int)]=self.findPath()
         if agentSequence==None:
             print("No solution")
             return False
-        print(agentSequence)
+        # print(agentSequence)
         self.startSequence(agentSequence)
         #self.enviroment.print_enviroment()
         return True
+        """
     
     def findPath(self) -> list[(int,int)] :
         grid=self.enviroment.grid
         last_pos=(self.enviroment.endR,self.enviroment.endC)
         init_pos=(self.agentPosition[0],self.agentPosition[1])
+        """
         solution:search.Node=None
         if self.strategy=="bfs":
             solution=search.bfs(grid, init_pos, last_pos, self.exploredNodes)
         elif self.strategy=="ucs":
             solution=search.ucs(grid, init_pos, last_pos, self.exploredNodes)
         elif self.strategy=="dfs":
-            solution=search.dfs(grid, init_pos, last_pos, self.exploredNodes)
+        """
+        print("!!!")
+        solution=search.DFS(grid, init_pos, last_pos, self.exploredNodes)
+        print("!!!")
+        """
         elif self.strategy=="dls":
             limit = math.ceil(len(grid)*len(grid[0])/2)
-            solution=search.dls(grid, init_pos, last_pos,limit, self.exploredNodes)
+            solution=search.dls(grid, init_pos, last_pos, limit, self.exploredNodes)
         else:
             print("?")
+        """
+
         
-        if solution == None:
-            return None
-        path:list[(int,int)]=[]
         
         if type(solution) != search.Node:
             if solution==0:
                 print("Cutoff occurred")
-            elif solution==-1:
+            elif solution==-1 or solution==None:
                 print("Failure")
             return None
         else:
+            path:list[(int,int)]=[]
             while solution!=None:
                 path.insert(0, solution.position)
                 solution=solution.parent
             return path
+    def amountOfExploration(self):
+        return(self.exploredNodes)
+    
+    
 
-
-env=Enviroment(50, 50, 0, 0, 28, 37, 0.1)
+env=Enviroment(80, 80, 0, 0, 59, 78, 0.1)
 env.print_enviroment()
-agent=Agent(env,"bfs")
+agent=Agent(env,"dfs")
 agent.think()
+print(len(agent.exploredNodes))
+print(sys.getrecursionlimit())
