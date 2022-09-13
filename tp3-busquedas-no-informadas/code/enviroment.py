@@ -102,3 +102,6 @@ class Enviroment:
         else:
             performance=cleanness
         return performance
+    
+env = Enviroment(10, 10, 0, 2, 8,9, 0.2)
+env.print_enviroment()
