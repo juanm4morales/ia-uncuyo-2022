@@ -38,7 +38,8 @@ class Enviroment:
         for r in range(0,rows):
             grid.append([])
             for c in range(0,cols):
-                cell=Cell()                
+                cell=Cell()
+                cell.cost=10;            
                 grid[r].append(cell)
         return grid
    
@@ -51,6 +52,7 @@ class Enviroment:
             c=random.randint(0, sizeC-1)
             if not(self.grid[r][c].obstacle) and not(self.grid[r][c].agent) and not(self.grid[r][c].goal):
                 self.grid[r][c].obstacle=True
+                self.grid[r][c].cost=math.inf
                 obstaclesToPut=obstaclesToPut-1
  
     def print_enviroment(self):
@@ -103,5 +105,3 @@ class Enviroment:
             performance=cleanness
         return performance
     
-env = Enviroment(10, 10, 0, 2, 8,9, 0.2)
-env.print_enviroment()

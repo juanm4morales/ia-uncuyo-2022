@@ -1,11 +1,11 @@
-import agents
+import agentsUninformed as agents
 import enviroment
 import random
 import sys
 
 import resultsPersistence as persistence
 
-sys.setrecursionlimit(100000)
+
 def simulation(results, size, obstacle_rate):
     initR = random.randint(0, size-1)
     initC = random.randint(0, size-1)
@@ -60,5 +60,5 @@ for i in range(0,n):
     #print("")
 print(results)
 print("---------------------------")
-persistence.storeResultsCSV(results)
-print(persistence.loadResults())
+#persistence.storeResultsCSV(results)
+# print(persistence.loadResults())

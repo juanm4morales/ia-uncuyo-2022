@@ -6,7 +6,6 @@ import random
 
 
 
-
 class Node:
     def __init__(self,position:Tuple[int,int],cost=0,parent=None):
         self.parent:Node=parent
