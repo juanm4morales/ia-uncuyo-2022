@@ -1,7 +1,12 @@
 import math
 import random
-class ChessBoard:
-    def __init__(self,size:int):
+
+import matplotlib.pyplot as plt
+
+class NQueensHC:
+    def __init__(self,size:int=8):
+        self.hFunc=[]
+        self.states:int=0
         self.size=size
         self.chessBoard=[]
         for i in range(size):
@@ -30,7 +35,6 @@ class ChessBoard:
                 
         return board
 
-
     def printMatrix(self, matrix):
         n=len(matrix)
         for r in range(0,n):
@@ -40,6 +44,7 @@ class ChessBoard:
             print("")
             
     def fillPossibleStatesCol(self, possibleStates:list[list[int]], row:int, col:int):
+        # min Possible h
         minPH=possibleStates[row][col]
         bestMoves=[row]
         for r in range(0,self.size):
@@ -57,11 +62,11 @@ class ChessBoard:
         self.chessBoard[col]=row
         return (minPH, col, bestMoves)
     
-    
             
     def hillClimbing(self):
         it=0
         h=self.h()
+        self.hFunc.append(h)
         possibleStates=self.createBoard()
         bestMoves:list[(float,int,list[int])]=[]
         minPHCol=math.inf
@@ -99,14 +104,13 @@ class ChessBoard:
             if nextH>=h:
                 return h
             h=nextH
+            self.hFunc.append(h)
+            #print(h)
         return h
 
-                    
-            
-# test.temp                
-chessBoard = ChessBoard(20)
-#print(chessBoard.chessBoard)
-h=chessBoard.hillClimbing()
-print("h="+str(h))
-print("Solution:")
-print(chessBoard.chessBoard)
+    def reset(self):
+        self.hFunc=[]
+        self.states:int=0
+        self.chessBoard=[]
+        for i in range(self.size):
+            self.chessBoard.append(random.randint(0,self.size-1))

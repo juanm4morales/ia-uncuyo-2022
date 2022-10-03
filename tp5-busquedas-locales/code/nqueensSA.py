@@ -1,13 +1,17 @@
 from math import exp, inf
 import random
 import copy
+import numpy
+import time
+import matplotlib.pyplot as plt
 
 COOLING_RATE=0.9
-INITIAL_TEMP=10.0
-class ChessBoard:
+INITIAL_TEMPETURE=4.0
+class NQueensSA:
     def __init__(self,size:int=8):
         self.size=size
         self.chessBoard=[]
+        self.hFunc=[] #used for results
         for i in range(size):
             self.chessBoard.append(random.randint(0,size-1))
 
@@ -36,7 +40,6 @@ class ChessBoard:
                 
         return board
 
-
     def printMatrix(self, matrix):
         n=len(matrix)
         for r in range(0,n):
@@ -44,21 +47,30 @@ class ChessBoard:
             for c in range(0,len(matrix[r])):
                 print(str(matrix[r][c])+ "|",end="")
             print("")
-            
-    def schedule(self,t:int,temp:float):
-        return temp*COOLING_RATE
+    
+    def schedule(self,t:int,tMax:float,steps:int,temp:float=None):
+        #return tMax/(t+1)
+        return tMax*((steps-t)/steps)**2
+        #return temp*COOLING_RATE
+        #return tMax*(1/(1+exp((2*numpy.log(tMax)/steps)*(t-0.5*steps))))
+        #return tMax*((steps-t)/steps)**2
+        #return 50/(1+0.01*t**2)
             
     def simulatedAnnealing(self):
         h=self.h()
-        t=0
-        temp=INITIAL_TEMP
+        self.hFunc.append(h) #used for results
+        n = int((10/4)*self.size**3)
         current=self.chessBoard
-
-        while True:
+        maxTemp=INITIAL_TEMPETURE
+        t=0
+        
+        while h!=0 and t<n:
+            
             possible=copy.deepcopy(self.chessBoard)
-            temp=self.schedule(t,temp)
-
-            if temp < 0.05:
+            temp=self.schedule(t,maxTemp,n)
+            
+            if temp==0:
+                print("IN")
                 return h
             rc=random.randint(0,self.size-1)
             rr=current[rc]
@@ -67,30 +79,26 @@ class ChessBoard:
 
             possible[rc]=rr
             newH=self.h(possible)
+
             eDiff=newH-h
             if eDiff<0:
                 current[rc]=rr
-                h=newH
-            else:
-                
+                h=newH     
+            
+            elif eDiff>0:
                 rdm=random.uniform(0,1)
-
                 probability=exp(-eDiff/temp)
-                #if (probability!=1):
-                #    print("probability: " +str(probability))
-                if rdm<probability:
-                   
+                
+                if rdm<probability:    
                     current[rc]==rr
                     h=newH
+            self.hFunc.append(h) #used for results
             t+=1
+            
         return h
                     
-
-
-#for i in range(0,1):                
-#    chessBoard=ChessBoard()
-    #print(chessBoard.chessBoard)
-#    h=chessBoard.simulatedAnnealing()
-    #print(h)
-
-#print(chessBoard.chessBoard)
+    def reset(self):
+        self.chessBoard=[]
+        self.hFunc=[] #used for results
+        for i in range(self.size):
+            self.chessBoard.append(random.randint(0,self.size-1))
