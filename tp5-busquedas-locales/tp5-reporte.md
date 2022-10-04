@@ -153,26 +153,40 @@ $$ size_{population} = {n*(n-1)} $$
 | Simulated annealing | 48,18166 | 373,54916 | 338,12333  | 680,46301 | 908,78088 | 2914,02062   
 <br>  
 
+### **Distribución del tiempo de ejecución por algoritmo mediante diagramas de caja y bigote**  
+
+<br>   
+
+![Boxplots del tiempo de ejecución para n=4,8,10](images/boxplots4_8_10.png)
+***Figura 5**: Boxplots del tiempo de ejecución para n=4,8,10*  
+
+<br>  
+
+![Boxplots del tiempo de ejecución para n=12,15](images/boxplots12_15.png)
+***Figura 5**: Boxplots del tiempo de ejecución para n=12,15*  
+
+<br>  
+
 ### **Variación de la función fitness (h)**
 <br>  
 
 #### **Hill Climbing**
-![Función fitness en Hill Climbing para n=8](images/HC_hFunc_8.png)
 
-***Figura 5**: Función fitness en Hill Climbing para n=8* 
+![Función fitness en Hill Climbing para n=8](images/HC_hFunc_8.png)
+***Figura 7**: Función fitness en Hill Climbing para n=8* 
 
 <br>  
 
 #### **Simulated Annealing**
 ![Función fitness en Simulated Annealing para n=8](images/SA_hFunc_8.png)
-***Figura 6**: Función fitness en Simulated Annealing para n=8*  
+***Figura 8**: Función fitness en Simulated Annealing para n=8*  
 <br>  
 
 #### **Algoritmo Genético**
 De toda la población se selecciona el fitness del **mejor individuo**de la generación.  
 
 ![Función fitness en Algoritmo Genético para n=8](images/GA_hFunc_8.png)
-***Figura 7**: Función fitness en Algoritmo Genético para n=8*  
+***Figura 9**: Función fitness en Algoritmo Genético para n=8*  
 <br>  
 
 
