@@ -35,10 +35,10 @@ El algoritmo principal para la búsqueda de la solución es **Backtracking**. No
             if value is consistent with assignment then
                 add {var = value} to assignment
                 inferences ← INFERENCE(csp, var, value)
-                if inferences = failure then
+                if inferences != failure then
                     add inferences to assignment
                     result ← BACKTRACK(assignment, csp)
-                    if result = failure then
+                    if result != failure then
                         return result
             remove {var = value} and inferences from assignment
     return failure
