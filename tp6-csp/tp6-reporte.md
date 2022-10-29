@@ -35,7 +35,7 @@ El algoritmo principal para la búsqueda de la solución es **Backtracking**. No
             if value is consistent with assignment then
                 add {var = value} to assignment
                 inferences ← INFERENCE(csp, var, value)
-                if inferences = failure then
+                if inferences != failure then
                     add inferences to assignment
                     result ← BACKTRACK(assignment, csp)
                     if result = failure then
@@ -116,7 +116,7 @@ Finalmente en la iteración nº 30, el dominio de Q (Queensland) queda vacío lu
 CSP?**  
 
 AC-3 en árboles estructurados tiene una complejidad $O(nd^2)$, siendo *n* el número de variables (nodos) y *d* es el tamaño del dominio más grande. Para el árbol estructurado elegimos una variable como raíz, y luego un orden de las variables (nodos) tal que el padre de cada uno lo preceda en el orden.  
-Luego al ejecutar AC-3 se evaluará la arco consistencia una vez por cada nodo siguiendo el orden establecido. Como la complejidad de REVISE es como mucho $d^2$. Entonces $O(nd^2)$ es la complejidad de AC-3 en árboles estructurados.  
+Luego al ejecutar AC-3 se evaluará la arco consistencia del padre del nodo con el mismo nodo en $n$ pasos, siguiendo un orden inverso al establecido. Como la complejidad de REVISE es como mucho $d^2$. Entonces $O(nd^2)$ es la complejidad de AC-3 en árboles estructurados.
 
 <br>  
 
@@ -182,3 +182,52 @@ Con esta implementación, cada vez que se borre un valor del dominio de $Xi$, re
 
 ## **Ejercicio 5**
 **Demostración de la correctitud del algoritmo CSP para árboles estructurados.  
+
+El algoritmo para CSP´s en árboles estructurados inicialmemte elige una variable como raíz del árbol, se ordenarán linealmente todas las variables, de forma tal que cada variable aparezca después que su padre (**orden topológico**). Luego, en sentido inverso al orden establecido, lograremos arco consistencia dirigida entre el nodo padre y el nodo en cuestión. Una vez tengamos nuestro árbol con arco consistencia dirigida, asignaremos valores del dominio restante a cada variable del CSP.  
+Ya que cada enlace desde un padre al hijo es arco consistente, sabemos que para cualquier valor que elijamos para el padre, quedará un valor válido a elegir para el hijo. Por lo tanto solo tendremos relaciones *padre-hijo* y no será necesario resolver más que la arco consistencia para garantizar n-consistencia (por las características del árbol), siendo n el número de nodos del árbol.
+
+## **Ejercicio 6**
+**Resultados** obtenidas de las soluciones al problema de las n-reinas utilizando una formulación CSP. Las dos soluciones son: utilizando **backtracking** y otra utilizando **forward checking**. Para 4, 8, 10, 12 y 15 reinas.  
+Se realizaron 30 ejecuciones de cada algoritmo implementado y se recopilaron datos de los tiempos de ejecución y los estados (nodos del árbol de búsqueda) recorridos.
+
+### **Tiempo de ejecución promedio**
+
+|Algorithm       |4 queens            |8 queens   |10 queens  |12 queens  |15 queens  |
+|----------------|--------------------|-----------|-----------|-----------|-----------|
+|Backtracking    |0.000131249         |0.000867693|0.001063251|0.003292878|0.024688466|
+|Dorward Checking|0.000132966         |0.003822263|0.004254047|0.01236403 |0.073597018|
+
+
+
+### **Tiempos de ejecución por algoritmo mediante diagramas de caja y bigote**  
+
+<br>
+<img src="images/algo_time_4_8_10.png" alt="drawing" width="800"/>  
+
+*Boxplots del tiempo de ejecución para n=4,8,10*  
+
+<img src="images/algo_time_12_15.png" alt="drawing" width="800"/>  
+
+*Boxplots del tiempo de ejecución para n=12,15*   
+<br> 
+
+### **Estados recorridos**
+
+|Amount of states  |4 queens   |8 queens   |10 queens  |12 queens  |15 queens  |
+|----------------- |-----------|-----------|-----------|-----------|-----------|
+|Backtracking      |26         |876        |975        |3066       |20280      |
+|Forward checking  |8          |113        |102        |261        |1359       |
+
+<br>
+
+### **Estados recorridos por algoritmo mediante diagramas de caja y bigote**  
+
+<br>
+<img src="images/algo_states_4_8_10.png" alt="drawing" width="800"/>  
+
+*Boxplots de estados recorridos para n=4,8,10*  
+
+<img src="images/algo_states_12_15.png" alt="drawing" width="800"/>  
+
+*Boxplots de estados recorridos para n=12,15*  
+
