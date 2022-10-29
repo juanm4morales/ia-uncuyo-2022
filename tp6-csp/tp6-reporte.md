@@ -195,7 +195,7 @@ Se realizaron 30 ejecuciones de cada algoritmo implementado y se recopilaron dat
 |Algorithm       |4 queens            |8 queens   |10 queens  |12 queens  |15 queens  |
 |----------------|--------------------|-----------|-----------|-----------|-----------|
 |Backtracking    |0.000131249         |0.000867693|0.001063251|0.003292878|0.024688466|
-|Dorward Checking|0.000132966         |0.003822263|0.004254047|0.01236403 |0.073597018|
+|Forward Checking|0.000132966         |0.003822263|0.004254047|0.01236403 |0.073597018|
 
 
 
