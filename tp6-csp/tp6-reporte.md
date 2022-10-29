@@ -38,7 +38,7 @@ El algoritmo principal para la búsqueda de la solución es **Backtracking**. No
                 if inferences != failure then
                     add inferences to assignment
                     result ← BACKTRACK(assignment, csp)
-                    if result = failure then
+                    if result != failure then
                         return result
             remove {var = value} and inferences from assignment
     return failure
