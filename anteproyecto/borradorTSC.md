@@ -69,5 +69,4 @@ Para extrar información de la intersección del semáforo y enviar ordenes para
 
 + Cantidad de veces que se detiene un vehículo ($|V_i|=0$)
 
-+ Cantidad de veces que se detiene un vehículo ($|V_i|=0$)
 
