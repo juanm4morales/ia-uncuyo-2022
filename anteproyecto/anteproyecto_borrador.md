@@ -22,13 +22,13 @@ La eficiencia de dicho método será evaluada utilizando las siguientes métrica
 
 Las métricas más importantes a minimizar son, el **tiempo de espera promedio** de todos los vehículos, por simulación, y la **cantidad de detenciones promedio**, por simulación. Aunque la intención es que la política utilizada, también reduzca cierta medida el tiempos de espera y las detenciones que pueda tener un vehículo. De esta forma evitar la mayor cantidad posible de "casos injustos".
 
-### Modelo de reinforcement learning para el control de semáforos
+### Características del modelo de reinforcement learning para el control de semáforos
 
 + Agente: el controlador de semáforos de la intersección.
 
 + La política de control se obtiene mapeando desde los estados del tráfico hacia las acciones de control "óptimas".
 
-+ Estados: información de la **posición** y **velocidad** de cada vehiculo en la intersección. También es posible que tenga información de otras intersecciones vecinas **(a decidir)**.
++ Estados: información de la **posición**, **velocidad**, **tiempo de espera** de cada vehiculo en la intersección y las señales actuales de los semáforos. También es posible que tenga información de otras intersecciones vecinas **(a decidir)**.
 
 + Acciones: el controlador por cada unidad de tiempo $t$ (*fijada*) podrá incrementar o decrementar en $x_t$ cantidad de segundos, el tiempo en verde o rojo de un semáforo determinado. Si la intersección tiene 4 calles de doble mano cada una, dicha intersección tendrá 4 semáforos.
 
