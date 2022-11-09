@@ -9,7 +9,7 @@ Los semáforos son el principal árbitro para gestionar tráfico en interseccion
 
 ## Solución propuesta
 
-La idea principal para reducir las problemáticas descritras, es controlar las luces del semáforo utilizando una política que se ajuste dinámicamente al tráfico actual. Para esto propongo utilizar una metodología de reinforcement learning, dónde el agente será el controlador de semáforos y el entorno estará modelado por un proceso de decisión de Markov, el cuál está representado por $ < S,A,P,R >$, dónde $S$ es el espacio de estados, $A$ es el espacio de acciones, $P$ es la función de probabilidad de transición de estados y $R$ es la función de recompensas.  
+La idea principal para reducir las problemáticas descritras, es controlar las luces del semáforo utilizando una política que se ajuste dinámicamente al tráfico actual. Para esto propongo utilizar una metodología de reinforcement learning, dónde el agente será el controlador de semáforos y el entorno estará modelado por un proceso de decisión de Markov, el cuál está representado por $< S,A,P,R >$, dónde $S$ es el espacio de estados, $A$ es el espacio de acciones, $P$ es la función de probabilidad de transición de estados y $R$ es la función de recompensas.  
 
 En un principio el algoritmo 
 
