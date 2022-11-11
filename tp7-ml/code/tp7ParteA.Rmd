@@ -1,0 +1,141 @@
+```{r}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(caret)
+library(tibble)
+
+source("mlFunctions.R")
+
+
+data <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double(),
+  inclinacion_peligrosa = col_integer()
+))
+
+data$inclinacion_peligrosa<-as.factor(data$inclinacion_peligrosa)
+
+trainIndex <- createDataPartition(data$id,p=.8,list=FALSE)
+data_train <- data[trainIndex,]
+data_validation <- data[-trainIndex,]
+
+write_csv(data_train,"../data/Arbolado-publico-mendoza-2021-train.csv")
+write_csv(data_validation,"../data/Arbolado-publico-mendoza-2021-validation.csv")
+```
+
+```{r}
+ggplot(data_train, aes(x=inclinacion_peligrosa)) + geom_bar(aes(y=((..count..)/sum(..count..))*100)) + ylab("% Árboles") +
+theme_light()
+```
+``` {r}
+data_train %>%
+  group_by(inclinacion_peligrosa) %>%
+  summarise(cantidad=n()) %>%
+  mutate(Porcentaje = (round(cantidad/sum(cantidad),4))*100)
+
+```
+
+```{r}
+ggplot(data_train)+
+  geom_bar(aes(x=as.factor(inclinacion_peligrosa),fill=as.factor(inclinacion_peligrosa)   ))+
+  facet_wrap(~seccion) + theme_light()
+```
+
+```{r}
+data_train %>%
+  group_by(seccion,inclinacion_peligrosa) %>%
+  summarise(n=n()) %>%
+  mutate(prop=n/sum(n)) %>%
+  filter(inclinacion_peligrosa==1) %>%
+  ggplot(aes(x=factor(seccion), y=prop)) +
+  geom_col()+
+  xlab("seccion")+
+  ylab("Prop. inclinación peligrosa") +
+  theme_light()
+```
+Por falta de muestras con inclinación peligrosa no es posible afirmar con certeza que sección condiciona la peligrosidad del árbol muestra.
+
+```{r fig.height=8, fig.width=10}
+ggplot(data_train)+
+  geom_bar(aes(x=as.factor(inclinacion_peligrosa),fill=factor(inclinacion_peligrosa)))+
+  facet_wrap(~especie) + theme_light()
+```
+```{r}
+data_train %>%
+  group_by(especie,inclinacion_peligrosa) %>%
+  summarise(n=n()) %>%
+  mutate(prop=n/sum(n)) %>%
+  filter(inclinacion_peligrosa==1) %>%
+  ggplot(aes(y=factor(especie), x=prop)) +
+  geom_col()+
+  xlab("especie")+
+  ylab("Prop. inclinación peligrosa") +
+  theme_light()
+```
+
+
+```{r}
+ggplot(data_train, aes(circ_tronco_cm)) + geom_histogram(bins = 100,color="black", size=0.2, fill="lightblue") + theme_light() + scale_x_continuous(n.breaks = 25)
+```
+```{r}
+ggplot(data_train, aes(circ_tronco_cm)) + geom_histogram(bins = 8,color="black", size=0.2, fill="lightblue") + theme_light() + scale_x_continuous(n.breaks = 20)
+```
+```{r}
+ggplot(data_train, aes(x=circ_tronco_cm, fill=inclinacion_peligrosa)) + geom_histogram(bins = 40, size=0.2, color="#e9ecef", alpha=0.5, position="identity") +scale_fill_manual(values=c("#69b3a2", "#404080")) +scale_x_continuous(n.breaks = 20) + theme(axis.text.x = element_text(angle=90))
+```
+```{r}
+data_train_circ_tronco <-
+  data_train %>% mutate(circ_tronco_cm_cat=
+                          ifelse(circ_tronco_cm<50, "bajo",
+                                 ifelse(circ_tronco_cm<125, "medio",
+                                        ifelse(circ_tronco_cm<200, "alto", "muy alto"))))
+
+custom_order <- c("bajo","medio","alto","muy alto")
+ggplot(data_train_circ_tronco, aes(x=factor(circ_tronco_cm_cat, level=custom_order))) + geom_bar() + theme_light() +xlab("Categoría de circ. tronco (cm)")
+
+
+```
+
+```{r}
+write_csv(data_train_circ_tronco,"../data/arbolado-publico-mendoza-2021-circ_tronco_cm-train.csv")
+```
+
+```{r}
+predictions_rdm <- random_classifier(random_predictor(data_validation))
+d_binomial_rdm <- tibble("target" = predictions_rdm$inclinacion_peligrosa, "prediction" = predictions_rdm$prediction_class)
+confusion_matrix_rdm <- get_confussionMatrix(d_binomial_rdm)
+# confusionMatrix(factor(predictions_rdm$inclinacion_peligrosa),factor(predictions_rdm$prediction_class))
+```
+
+```{r}
+predictions_bc <- biggerclass_classifier(data_validation)
+d_binomial_bc <- tibble("target" = predictions_bc$inclinacion_peligrosa, "prediction" = predictions_bc$prediction_class)
+confusion_matrix_bc <- get_confussionMatrix(d_binomial_bc)
+# confusionMatrix(factor(d_binomial_bc$target),factor(d_binomial_bc$prediction))
+```
+
+```{r echo=F}
+print("Métricas clasificador aleatorio")
+get_metrics(confusion_matrix_rdm)
+cat("--------------------------------------------\n")
+print("Métricas clasificador clase mayoritaria")
+get_metrics(confusion_matrix_bc)
+
+```
+
+```{r}
+
+d_binomial_cv<-cross_validation(data,8)
+ 
+```
