@@ -29,7 +29,7 @@ El modelo será evaluado via simulación, en Simulation of Urban MObility (SUMO)
 
 + Estados: información de la **posición**, **velocidad**, **tiempo de espera** de cada vehiculo en la intersección y las **señales** actuales de los semáforos.
 
-+ Acciones: el controlador seleccionará la duración de cada fase  . Si la intersección tiene 4 calles de doble mano cada una, dicha intersección tendrá 4 semáforos.
++ Acciones: el controlador seleccionará la duración de cada fase.
 
 + Recompensa: las recompensas que obtendrá el agente serán en base a los tiempos de espera de los vehículos (en principio.)
 
