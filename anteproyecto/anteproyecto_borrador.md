@@ -31,8 +31,6 @@ El modelo será evaluado via simulación, en Simulation of Urban MObility (SUMO)
 
 + Acciones: el controlador seleccionará la duración de cada fase  . Si la intersección tiene 4 calles de doble mano cada una, dicha intersección tendrá 4 semáforos.
 
-+ La política de control se obtiene mapeando desde los estados del tráfico hacia las acciones de control "óptimas".
-
 + Recompensa: las recompensas que obtendrá el agente serán en base a los tiempos de espera de los vehículos (en principio.)
 
 
