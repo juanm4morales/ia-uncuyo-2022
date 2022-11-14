@@ -48,7 +48,7 @@ Para gestionar adecuadamente el tráfico en una intersección es necesario const
 1. Lectura bibliografía  
 
     1. Lectura Reinforcement Learning: An Introduction. 2nd Edition.  
-        1. Capítulo 3
+        1. Capítulo 3.
         2. Capítulo 4.  
         3. Capítulo 6.
 
@@ -63,6 +63,8 @@ Traffic Signal Control Management- Review. IJERT Journal.
 4. Diseño del sistema Agente-Entorno.
 
 5. Implementación.
+    1. Estructuras de datos para representar una intersección.
+    2. Agente con Q-learning.
 
 6. Resultados.
 
