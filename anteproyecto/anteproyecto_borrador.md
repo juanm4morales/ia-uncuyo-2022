@@ -46,7 +46,6 @@ Para gestionar adecuadamente el tráfico en una intersección es necesario const
 
 
 ## Listado de actividades a realizar
-<br>  
 
 1. Lectura bibliografía  
 
