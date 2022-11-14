@@ -14,7 +14,7 @@ La idea principal para reducir las problemáticas descritaas, es controlar las l
 El algoritmo a utilizar será Q learning, y de forma tentativa, también se intentará resolver mediante Deep Q Network.
 
 La eficiencia de la metodología utilizada se hará utilizando la siguiente métrica,
-$${AVG\_W_t=\frac{1}{n}\sum_{i=1}^{n} w_{i,t}}$$
+$$AVG\_{Wt}={\frac{1}{n}}{\sum_{i=1}^{n} w_{i,t}}$$
 
 dónde $w_{i,t}$ es el tiempo de espera del vehículo $i$ en el instante $t$.
 
