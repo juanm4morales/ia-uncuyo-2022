@@ -16,7 +16,11 @@ El algoritmo a utilizar será Q learning, y de forma tentativa, también se inte
 La eficiencia de la metodología utilizada se hará utilizando la siguiente métrica,
 $$AVG\_{Wt}={\frac{1}{n}}{\sum_{i=1}^{n} w_{i,t}}$$
 
+
 dónde $w_{i,t}$ es el tiempo de espera del vehículo $i$ en el instante $t$.
+
+El modelo será evaluado via simulación, en Simulation of Urban MObility (SUMO), un microsimulador de tráfico. Este provee una API en Python que nos permite acceder a la información completa del tráfico simulado, y manipular el comportamiento de este de forma "on-line".
+
 
 
 ### Características del agente modelo
@@ -35,6 +39,7 @@ dónde $w_{i,t}$ es el tiempo de espera del vehículo $i$ en el instante $t$.
 ![](./images/reinforcement_learning_traffic_model.png)
 
 
+
 ## Justificación
 <br>  
 Para gestionar adecuadamente el tráfico en una intersección es necesario construir un modelo que nos permita preveer la evolución del tráfico, al menos a corto plazo, contemplando todas las variables significantes. Una solución que considero apropiada es la de ajustar dinámicamente las señales de los semáforos en base al tráfico actual. Gracias a algoritmos de reinforcement learning, tales como Q-learning y Deep Q-Network, podemos aprender satisfacer adecuadamente lo planteado.
@@ -42,6 +47,36 @@ Para gestionar adecuadamente el tráfico en una intersección es necesario const
 
 ## Listado de actividades a realizar
 <br>  
+
+1. Lectura bibliografía  
+
+    1. Lectura Reinforcement Learning: An Introduction. 2nd Edition.  
+        1. Capítulo 3
+        2. Capítulo 4.  
+        3. Capítulo 6.
+
+2. Lectura papers  
+    1. Deep Reinforcement Learning for Traffic Light Control in Vehicular Networks. IEEE Transactions on Vehicular Technology.
+    2. Using AI and Machine Learning Techniques for
+Traffic Signal Control Management- Review. IJERT Journal.  
+    3. Reinforcement Learning for Traffic Signal Control: Comparison with Commercial Systems. Transportation Research Procedia.  
+
+3. Lectura Documentación SUMO y TraCi (Python).
+
+4. Diseño del sistema Agente-Entorno.
+
+5. Implementación.
+
+6. Resultados.
+
+7. Redacción de informe.
+        
+Actividades tentativas
+
++ Investigar redes neuronales profundas.
++ Investigar algoritmo Deep Q Network (DQN)
++ Implementar solución con DQN.
++ Extender problema a una calle con $n$ intersecciones. Agente centralizado.
 
 ## Referencias
 [Deep Reinforcement Learning for Traffic Light Control in Vehicular Networks](https://arxiv.org/abs/1803.11115)   
