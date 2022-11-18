@@ -24,7 +24,7 @@ if canPredict:
 
 Luego se obtuvo un promedio de *accuracy*, dando como resultado,  
 
-$AVG\_accuracy = $ 0.7179.
+$AVG\_accuracy =$ 0.7179.
 
 
 ## Estrategias para datos de tipo **real**
