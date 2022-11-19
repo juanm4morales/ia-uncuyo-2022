@@ -95,7 +95,7 @@ Actividades tentativas.
 
 ### **Diagrama de Gantt**
 
-![gantt](./images/Online%20Gantt%2020221118.png)
+![gantt](./images/ganttTSCRL.png)
 
 ## Referencias
 [Liang, X., Du, X., Wang, G., &amp; Han, Z. (2019). A deep reinforcement learning network for Traffic Light Cycle Control. IEEE Transactions on Vehicular Technology, 68(2), 1243-1253. doi:10.1109/tvt.2018.2890726](https://arxiv.org/abs/1803.11115)   
