@@ -1,0 +1,67 @@
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+
+data <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double(),
+  inclinacion_peligrosa = col_integer()
+))
+
+data$inclinacion_peligrosa<-as.factor(data$inclinacion_peligrosa)
+data$seccion<-as.factor(data$seccion)
+data$especie<-as.factor(data$especie)
+data$altura<-as.factor(data$altura)
+data <- data %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+
+
+val <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset-test.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double()
+))
+
+
+val$seccion<-as.factor(val$seccion)
+val$especie<-as.factor(val$especie)
+val$altura<-as.factor(val$altura)
+val <- val %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+
+```
+
+```{r}
+nrow(val)
+
+
+```
+
+```{r}
+data %>% select(especie) %>% mutate(n=nrow())
+
+```
+
+
+```{r}
+ggplot(val, aes(y=especie)) + geom_bar()
+
+```

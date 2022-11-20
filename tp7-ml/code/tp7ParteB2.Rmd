@@ -1,0 +1,145 @@
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(caret)
+library(randomForest)
+library(tidyverse)
+```
+
+```{r}
+train <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double(),
+  inclinacion_peligrosa = col_integer()
+))
+#train <-train %>% mutate(inclinacion_peligrosa = ifelse(inclinacion_peligrosa==0,"no","yes"))
+train$inclinacion_peligrosa<-as.factor(train$inclinacion_peligrosa)
+train$seccion<-as.factor(train$seccion)
+train$especie<-as.factor(train$especie)
+train$altura<-as.factor(train$altura)
+train <- train %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+
+
+test <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset-test.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double()
+))
+
+test$seccion<-as.factor(test$seccion)
+test$especie<-as.factor(test$especie)
+test$altura<-as.factor(test$altura)
+test <- test %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+```
+
+```{r}
+
+tree_rec <- recipe(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat, data = train) %>%
+      step_other(especie,threshold = 0.002) %>%
+      step_downsample(inclinacion_peligrosa) %>%
+      prep()
+
+test_rec <- recipe(~ circ_tronco_cm + altura + especie + seccion + long + lat, data = test) %>%
+      step_other(especie,threshold = 0.002) %>%
+      prep()
+
+
+
+
+train.b <- bake(tree_rec, new_data = NULL)
+test.b <- bake(test_rec, new_data = NULL)
+
+
+levels(test.b$especie) <- levels(train.b$especie)
+levels(test.b$seccion) <- levels(train.b$seccion)
+levels(test.b$altura) <- levels(train.b$altura)
+
+
+train.b %>% group_by(especie) %>% count()
+
+```
+
+```{r}
+#ctrl_fast <- trainControl(method = "repeatedcv",
+                          number=5,
+                          repeats=2,
+                          allowParallel = TRUE,
+                          verboseIter=T,
+                          classProbs = T,
+                          summaryFunction = twoClassSummary)
+```
+
+```{r}
+#train_formula<-formula(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat)
+
+```
+
+```{r}
+    
+     
+#rfFitupsamp <- train(train_formula,
+                      data = train,
+                      tuneLenth = 5,
+                      method="rf",
+                      ntree = 700,
+                      trControl=ctrl_fast,
+                      metric = "ROC"
+                     )
+
+#rfFitupsamp
+
+```
+
+```{r}
+library(doMC)
+registerDoMC(cores=4)
+rf <- randomForest(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat,
+                   data=train.b,
+                   ntree=700,
+                   importance = TRUE)
+
+```
+
+
+```{r}
+
+#importance <- varImp(rfFitupsamp,scale=F)
+#plot(importance)
+```
+
+```{r}
+
+prediction=predict(rf,newdata=test.b)
+
+```
+
+```{r}
+prediction <- as.data.frame(prediction)
+prediction.df <- data.frame(test$id,prediction)
+colnames(prediction.df) <- c("ID", "inclinacion_peligrosa")
+```
+
+```{r}
+
+write_csv(prediction.df,"../data/submissions/submission5.csv")
+```

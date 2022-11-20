@@ -1,0 +1,360 @@
+### Libraries
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(caret)
+library(randomForest)
+```
+------------------------------------------------------------------------
+
+## Build final model
+
+```{r}
+data <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double(),
+  inclinacion_peligrosa = col_integer()
+))
+
+data$inclinacion_peligrosa<-as.factor(data$inclinacion_peligrosa)
+data$seccion<-as.factor(data$seccion)
+data$especie<-as.factor(data$especie)
+data$altura<-as.factor(data$altura)
+data <- data %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+
+
+
+test <- readr::read_csv("../data/arbolado-publico-mendoza-2021/arbolado-mza-dataset-test.csv",
+                              col_types = cols(
+  id = col_integer(),
+  especie = col_character(),
+  ultima_modificacion = col_character(),
+  altura = col_character(),
+  circ_tronco_cm = col_double(),
+  diametro_tronco = col_character(),
+  long = col_double(),
+  lat = col_double(),
+  seccion = col_integer(),
+  nombre_seccion = col_character(),
+  area_seccion = col_double()
+))
+
+test$seccion<-as.factor(test$seccion)
+test$especie<-as.factor(test$especie)
+test$altura<-as.factor(test$altura)
+test <- test %>% select (-c(ultima_modificacion, diametro_tronco, area_seccion,nombre_seccion))
+```
+
+
+### Recipe Oversampling
+### Oversampling. MWMote
+
+-   parameters
+    -   1º
+        -   ratio = 0.9
+
+
+```{r}
+
+# trees_train <- smotenc(data, var="inclinacion_peligrosa", k=40, over_ratio = 0.5)
+
+
+trees_train %>%
+  group_by(inclinacion_peligrosa) %>%
+  summarise(cantidad=n()) %>%
+  mutate(porcentaje = (round(cantidad/sum(cantidad),4))*100)
+
+```
+```{r}
+set.seed(12)
+trees_train <- data
+trees_test <- test
+
+#trainIndex <- createDataPartition(as.factor(data$inclinacion_peligrosa),p=0.8, list=FALSE)
+#train <- data[trainIndex,]
+#test <- data[-trainIndex,]
+#train$inclinacion_peligrosa <- as.factor(train$inclinacion_peligrosa)
+#test$inclinacion_peligrosa <- as.factor(test$inclinacion_peligrosa)
+```
+
+
+
+```{r}
+tree_rec <- recipe(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat, data = trees_train) %>%
+      step_other(especie,threshold = 0.001) %>%
+      step_dummy(all_nominal(), -all_outcomes()) %>%
+      step_smote(inclinacion_peligrosa, over_ratio = 0.85, neighbors = 30)
+# Estimate the required parameters from the training set
+tree_prep <- prep(tree_rec, log_changes = TRUE)
+# juice returns the results of the tree_rec where all steps have been applied to the data
+juiced <- juice(tree_prep)
+
+juiced %>%
+  group_by(inclinacion_peligrosa) %>%
+  summarise(cantidad=n()) %>%
+  mutate(porcentaje = (round(cantidad/sum(cantidad),4))*100)
+
+
+```
+
+
+
+
+
+### Model specification.
+
+Model specification for a random forest where we will tune mtry (number of predictors to sample at each split) and min_n (the number of observations needed to keep splitting nodes). These are **hyperparameters**.
+
+-   parameters
+    -   1º
+        -   trees = 1000
+        -   engine = "ranger"
+
+```{r}
+tune_spec <- rand_forest(
+  mtry = tune(),
+  trees = 1000,
+  min_n = tune()
+  ) %>%
+  set_mode("classification") %>%
+  set_engine("ranger")
+```
+
+tune_wf: Container object for carrying around bits of models
+
+```{r}
+tune_wf <- workflow() %>%
+  add_recipe(tree_rec) %>%
+  add_model(tune_spec)
+```
+
+### Train hyperparameters
+
+
+Cross validations resamples to user for tuning.
+-   parameters
+    -   1º
+        -   grid = 30
+        -   kNoisy = 80
+        -   kMajority = 50
+```{r}
+set.seed(544)
+trees_folds <- vfold_cv(trees_train,v = 5)
+
+```
+```{r}
+set.seed(456)
+
+tune_res <- tune_grid(
+  tune_wf,
+  resamples = trees_folds,
+  grid = 20,
+  metrics = metric_set(roc_auc,accuracy)
+)
+
+```
+
+Looking at AUC
+
+```{r}
+tune_res %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%
+  select(mean, min_n, mtry) %>%
+  pivot_longer(min_n:mtry,
+               values_to = "value",
+               names_to = "parameter") %>%
+  ggplot(aes(value, mean, color = parameter)) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~parameter,scales="free_x")
+
+```
+```{r}
+tune_res %>%
+  collect_metrics()
+
+select_best(tune_res, "roc_auc")
+```
+best.2
++ mtry = 30
++ min_m=3
+
+best.1  
++ mtry = 25
++ min_n = 10
+
+**regular grid**
+
+```{r}
+rf_grid <- grid_regular(
+  mtry(range = c(14,16)),
+  min_n(range=c(30,34)),
+  levels = 2
+  )
+
+set.seed(789)
+
+regular_res <- tune_grid(
+  tune_wf,
+  resamples = trees_folds,
+  grid = rf_grid,
+  metrics = metric_set(roc_auc,accuracy)
+)
+
+```
+
+Results
+
+```{r}
+regular_res %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%
+  select(mean, min_n, mtry) %>%
+  pivot_longer(min_n:mtry,
+               values_to = "value",
+               names_to = "parameter") %>%
+  ggplot(aes(value, mean, color = parameter)) +
+  geom_point(show.legend = FALSE) +
+  facet_wrap(~parameter,scales="free_x")
+
+
+regular_res %>%
+  collect_metrics() %>%
+  filter(.metric == "roc_auc") %>%
+  mutate(min_n = factor(min_n)) %>%
+  ggplot(aes(mtry,mean,color = min_n))+
+  geom_line(alpha=0.5, size=1.5)+
+  geom_point()
+
+regular_res %>%
+  collect_metrics()
+
+```
+
+### Choosing the best model
+
+```{r}
+best_auc <- select_best(tune_res, "roc_auc")
+
+final_rf <- finalize_model(
+  tune_spec,
+  best_auc
+)
+
+```
+
+### Variables importance
+
+```{r}
+library(vip)
+
+
+final_rf %>%
+  set_engine("ranger", importance="permutation") %>%
+  fit(inclinacion_peligrosa ~., data = juice(tree_prep)) %>%
+  vip(geom="point")
+
+```
+
+### Final workflow + final model on the the entire training set + evaluation on testing set
+
+```{r}
+final_wf <- workflow () %>%
+  add_recipe(tree_rec) %>%
+  add_model(final_rf)
+
+
+fit_workflow <- fit(final_wf,trees_train)
+
+prediction<-predict(fit_workflow,trees_test)
+
+
+ID <- trees_test$id
+output1.df <- as.data.frame(ID)
+
+
+output1.df$inclinacion_peligrosa <- prediction$.pred_class
+
+
+write_csv(output1.df,"../data/submissions/submission2.csv")
+
+```
+
+### Map
+
+```{r}
+final_res %>%
+  collect_predictions() %>%
+  mutate(correct = case_when(inclinacion_peligrosa==.pred_class ~ "Correct",
+                             TRUE ~ "Incorrect")) %>%
+  bind_cols(trees_test) %>%
+  ggplot(aes(long,lat, color = correct)) +
+  geom_point(size=0.5, aplha=0.5) +
+  labs(color=NULL) +
+  scale_color_manual(values = c("gray80", "darkred"))
+
+```
+
+
+
+
+
+
+```{r}
+
+ctrl_fast <- trainControl(method = "repeatedcv",
+                          number=5,
+                          repeats=3,
+                          allowParallel = TRUE
+                          )
+
+```
+
+```{r}
+
+train_formula<-formula(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat)
+
+
+rec <-
+      recipe(inclinacion_peligrosa ~ circ_tronco_cm + altura + especie + seccion + long + lat,
+             data = train) %>%
+      step_other(especie) %>%
+      prep()
+    
+new_train <- bake(rec, new_data=train)
+new_test <- bake(rec, new_data=test)
+
+
+rfFitupsamp <- train(train_formula,
+                      data = new_train,
+                      tuneLenth = 15,
+                      method="rf",
+                      trControl=ctrl_fast,
+                      metric="Accuracy")
+
+rfFitupsamp$finalModel
+
+```
+
+```{r}
+importance <- varImp(rfFitupsamp, scale=FALSE)
+plot(importance)
+```
+
+```{r}
+predsrfprobsamp=predict(rfFitupsamp,new_test)
+as.data.frame(predsrfprobsamp)
+confusionMatrix(predsrfprobsamp,as.factor(test$inclinacion_peligrosa))
+```
