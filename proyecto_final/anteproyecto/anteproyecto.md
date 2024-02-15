@@ -1,7 +1,7 @@
 # Controlador dinámico de semáforos usando reinforcement learning
 ### Código del projecto: TSCRL
 ### Integrantes: Juan Martín Morales
-<br>  
+<br>
 
 ## Introducción
 
