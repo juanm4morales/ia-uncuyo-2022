@@ -1,5 +1,6 @@
 import traci
 from sumolib import checkBinary
+from typing import Dict
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -13,23 +14,39 @@ class Vehicle:
         self.length = length
         self.maxSpeed = maxSpeed
         self.waitingTime = 0
+    
+    def update(self, deltaTime):
+        self.waitingTime += deltaTime
         
-class LaneQueue:
+class Lane:
     def __init__(self, laneLength):
-        self.vehicles = []
-        # self.congestion_lvl = 0
+        
+        # self.vehicleMinGap = vehicleMinGap
         self.laneLength = laneLength
+        self.haltedVehicleAmount = 0
+        self.waitingTime = 0
         
-    def addVehicle(self, vehicle):
-        self.vehicles.append(vehicle)
-        
+    def update(self, vehicleAmount, waitingTime):
+        self.vehicleAmount = vehicleAmount
+        self.waitingTime = waitingTime
+    
+    def removeVehicle(self, amount=1):
+        for i in range(amount):
+            vehicleRef = self.vehicles.pop(0)
+            del vehicleRef # Elimino la referencia, así el garbage collector de python lo elimina de memoria
+            
     def getTotalWaitingTime(self):
         return sum(vehicle.waitingTime for vehicle in self.vehicles)
     
     def getAvgWaitingTime(self):
         return self.getTotalWaitingTime() / len(self.vehicles)
-        
-        
+    
+    def getQueueLength(self):
+        queueLength = 0
+        for vehicle in self.vehicles:
+            queueLength += (vehicle.length + self.vehicleMinGap)
+        return queueLength
+                    
 class TrafficLight:
     class Phase:
         def __init__(self, state, yellowTransition):
@@ -56,34 +73,64 @@ class TrafficLight:
         self.yellowTime = yellowTime
         self.minGreenTime = minGreenTime
         self.maxGreenTime = maxGreenTime
-        self.yellowTransition = 0
+
+        self.yellow = False
         self.currentPhaseTime = 0
         
     def update(self):
         if (self.currentPhase != self.nextPhase):
-            if self.yellowTransition > 0:
-                self.yellowTransition -= 1
-            else:
+            if self.yellow and self.currentPhaseTime > self.yellowTime:
+                traci.trafficlight.setRedYellowGreenState(0, self.nextPhase)
                 self.currentPhase = self.nextPhase
+                self.currentPhaseTime = 0
+                self.yellow = False
+                
+        traci.simulationStep() 
         self.currentPhaseTime += 1
+    
+    def canChange(self):
+        return not(self.yellow) and (self.currentPhaseTime >= self.minGreenTime)
     
     def changePhase(self, newPhase):
         if (self.currentPhase != newPhase):
-            if (self.currentPhaseTime > self.minGreenTime):
-                phaseObject = self.PHASES[self.changePhase]
-                yellowPhase = phaseObject.yellowTransition
-                self.yellowTransition = self.yellowTime
+            if self.canChange():
+                yellowPhase = self.PHASES[self.currentPhase].yellowTransition
+                traci.trafficlight.setRedYellowGreenState(0, yellowPhase)
+                self.yellow = True
                 self.currentPhase = yellowPhase
-                self.currentPhaseTime=0
-                self.nextPhase = newPhase
-                return self.currentPhaseTime
+                previousPhaseTime = self.currentPhaseTime
+                self.currentPhaseTime = 0
+                self.nextPhase = self.PHASES[newPhase].state
+                return previousPhaseTime
             else:
                 # No ha pasado el mínimo de tiempo de duración de la fase
                 return -1
         else:
             # La fase actual es la misma que la nueva
             return -2
+
+class State:
+    def __init__(self, tlPhase, lanes: Dict[str, Lane]):
+        self.tlPhase = tlPhase
+        self.discreteLaneQueue = self.discretizeLaneInfo(lanes)
+    
+    def discretizeLaneInfo(self, lanes: Dict[str, Lane]):
+        discreteLaneQueue: Dict[str, int] = {}
+        for laneId, lane in lanes.items():
+            discreteLaneQueue[laneId] = lane.haltedVehicleAmount
+        return discreteLaneQueue
             
+    def getQueueCategory(self, queueAmount):
+        if 0 <= queueAmount < 2:
+            return 0
+        if 2 <= queueAmount < 6:
+            return 1
+        if 6 <= queueAmount < 10:
+            return 2
+        if queueAmount >= 10:
+            return 3
+        
+
 
 class SumoEnviroment:
     INTERSECTION_SIZE=4
@@ -94,21 +141,20 @@ class SumoEnviroment:
         self.trafficLight = TrafficLight("rrrrrrrrrrrrrrrr", yellowTime, minGreenTime, maxGreenTime)
         self.gui = gui
         
-        tls_ids = traci.trafficlight.getIDList()
-        lanes = traci.trafficlight.getControlledLanes(tls_ids[0])
-        maxLaneLength = 0
-        for lane in lanes:
-            if traci.lane.getLength(lane) > maxLaneLength:
-                maxLaneLength = traci.lane.getLength(lane)
-            
         
-        for i in range(self.INTERSECTION_SIZE):
-            # Para un solo controlador de semáforo   
-            lanes[i] = LaneQueue(maxLaneLength)
+        tls_ids = traci.trafficlight.getIDList()
+        lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
+
+        # self.lanes = {} # Usar carriles
+        self.edges = {} # Usar aristas
+        for laneId in lanesIds:
+            if "in" in laneId:
+                # Carril de entrada
+                edgeId = traci.lane.getEdgeID(laneId)                     # aristas
+                if edgeId not in self.edges:                              # aristas
+                    self.edges[edgeId] = Lane(traci.lane.getLength(lane)) # aristas
+                #self.lanes[lane] = Lane(traci.lane.getLength(lane))    # carriles   
             
-            
-           
-        # FALTA inicializar colas de vehículos en carriles
         if gui:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
@@ -117,14 +163,27 @@ class SumoEnviroment:
     def initializeSimulation(self):
         sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile, "--tripinfo-output", "tripinfo.xml"]
         traci.start(sumoCMD)
+        
+    
+        
+    def getCurrentState(self):
+        return State(self.trafficLight.currentPhase, self.edges)
     
     def step(self, action):
-        self.trafficLight.changePhase(action)
-        self.trafficLight.update()
-        traci.simulationStep()
-        # Retornar estado y recompensa
+        
+        # TOMAR ACCIÓN
+        if self.validAction(action):
+            self.trafficLight.changePhase(action)
+            
+        # PASO DE TIEMPO (deltaTime)   
+        for _ in range(self.deltaTime):
+            self.trafficLight.update()
         
         
+        state = self.getCurrentState()
+        reward = self.computeReward()
+        
+        return state, reward
         
     
                 

@@ -9,3 +9,4 @@ class QLAgent:
         self.gamma = gamma
         self.alpha = alpha
         # self.qTable
+        
