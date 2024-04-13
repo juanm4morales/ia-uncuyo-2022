@@ -105,3 +105,6 @@ Actividades tentativas.
 [IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides)](https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p)
 
 [SUMO Developer Documentation](https://sumo.dlr.de/docs/Developer/index.html)
+
+
+De las siguientes slides:

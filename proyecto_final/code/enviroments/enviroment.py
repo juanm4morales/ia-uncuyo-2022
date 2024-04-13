@@ -19,22 +19,26 @@ class Vehicle:
         self.waitingTime += deltaTime
         
 class Lane:
-    def __init__(self, laneLength):
+    def __init__(self, laneId, laneLength):
         
         # self.vehicleMinGap = vehicleMinGap
-        self.laneLength = laneLength
-        self.haltedVehicleAmount = 0
+        # self.vehicles = []
+        self.laneId = laneId
+        # self.laneLength = laneLength
+        self.lastStepHaltedVehicles = 0
         self.waitingTime = 0
         
-    def update(self, vehicleAmount, waitingTime):
-        self.vehicleAmount = vehicleAmount
-        self.waitingTime = waitingTime
-    
+    def update(self):
+        self.lastStepHaltedVehicles = traci.lane.getLastStepHaltingNumber(self.laneId)
+        self.waitingTime = traci.lane.getWaitingTime(self.laneId)
+        
+    """
+    # Para gestionar vehículo por vehículo
     def removeVehicle(self, amount=1):
         for i in range(amount):
             vehicleRef = self.vehicles.pop(0)
             del vehicleRef # Elimino la referencia, así el garbage collector de python lo elimina de memoria
-            
+        
     def getTotalWaitingTime(self):
         return sum(vehicle.waitingTime for vehicle in self.vehicles)
     
@@ -46,6 +50,20 @@ class Lane:
         for vehicle in self.vehicles:
             queueLength += (vehicle.length + self.vehicleMinGap)
         return queueLength
+    """
+    
+    def searchVehiclesByWaitingTime(self, maxTime):
+        vehicleIds = traci.lane.getLastStepVehicleIDs(self.laneId)
+        vehiclesLongWait = []
+        vehicleWaitingTime = 0
+        for vehicleId in vehicleIds:
+            vehicleWaitingTime = traci.vehicle.getWaitingTime(vehicleId)
+            if vehicleWaitingTime > maxTime:
+                vehiclesLongWait.append((vehicleId, vehicleWaitingTime))
+        
+        return vehiclesLongWait
+                
+          
                     
 class TrafficLight:
     class Phase:
@@ -117,10 +135,10 @@ class State:
     def discretizeLaneInfo(self, lanes: Dict[str, Lane]):
         discreteLaneQueue: Dict[str, int] = {}
         for laneId, lane in lanes.items():
-            discreteLaneQueue[laneId] = lane.haltedVehicleAmount
+            discreteLaneQueue[laneId] = self.getQueueLengthCategory(lane.haltedVehicleAmount)
         return discreteLaneQueue
             
-    def getQueueCategory(self, queueAmount):
+    def getQueueLengthCategory(self, queueAmount):
         if 0 <= queueAmount < 2:
             return 0
         if 2 <= queueAmount < 6:
@@ -146,7 +164,7 @@ class SumoEnviroment:
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
 
         # self.lanes = {} # Usar carriles
-        self.edges = {} # Usar aristas
+        self.edges: Dict[str, Lane] = {} # Usar aristas
         for laneId in lanesIds:
             if "in" in laneId:
                 # Carril de entrada
@@ -179,6 +197,8 @@ class SumoEnviroment:
         for _ in range(self.deltaTime):
             self.trafficLight.update()
         
+        for edge in self.edges.values():
+            edge.update()
         
         state = self.getCurrentState()
         reward = self.computeReward()
