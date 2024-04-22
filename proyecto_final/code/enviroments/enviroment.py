@@ -158,8 +158,6 @@ class SumoEnviroment:
         self.deltaTime = deltaTime
         self.trafficLight = TrafficLight("rrrrrrrrrrrrrrrr", yellowTime, minGreenTime, maxGreenTime)
         self.gui = gui
-        
-        
         tls_ids = traci.trafficlight.getIDList()
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
 
@@ -177,6 +175,11 @@ class SumoEnviroment:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
             self.sumoBinary = checkBinary("sumo")
+            
+    @property
+    def observationSpace(self):
+        return self.trafficLight.PHASES.keys()
+    
         
     def initializeSimulation(self):
         sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile, "--tripinfo-output", "tripinfo.xml"]
