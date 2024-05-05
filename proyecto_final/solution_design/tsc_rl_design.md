@@ -106,7 +106,7 @@ $$W_t = \sum_{l=1}^{L} \sum_{i=1}^{N_l} w_{l_i}$$
 
 Entonces, el tiempo de espera acumulado en el instante $`t`$ respecto al instante $`t-1`$ se calcula como:
 
-$$ R_t = W_{t} - W_{t-1}$$
+$$R_t = W_{t} - W_{t-1}$$
 
 
 ### Agente Q-Learning
@@ -115,23 +115,17 @@ El proceso de Reinforcement Learning implica que el agente interactue con el ent
 
 La forma básica de la función de valor de acción se define mediante la ecuación:
 
-$$
-Q^{\pi}(s,a) = E \left[ r_{t} + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots \mid s_t = s, a_t = a, \pi \right]
-$$
+$$Q^{\pi}(s,a) = E \left[ r_{t} + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots \mid s_t = s, a_t = a, \pi \right]$$
 
 Esto representa la expectativa de la suma de las recompensas futuras ponderadas por el factor de descuento $`\gamma`$. El factor de descuento ($`0 \leq \gamma < 1`$) indica cuánto se priorizan las recompensas futuras en comparación con las inmediatas. En general, se presta atención tanto a las recompensas inmediatas como a las futuras, aunque se les da menos peso a estas últimas.
 
 Si el agente posee conocimiento sobre los valores de $`Q`$ para los estados futuros, puede elegir acciones de manera óptima. La política óptima $`\pi^*`$ seleccionará la acción que maximice la recompensa acumulada esperada. En otras palabras, en un estado dado $`s`$, el agente elegirá la acción $`a`$ que tenga el valor $`Q`$ más alto. Este valor óptimo de $`Q`$ se puede calcular recursivamente basándose en los valores óptimos de los estados futuros. Esto se conoce como la ecuación de Bellman para $`Q`$:
 
-$$
-Q^*(s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]
-$$
+$$Q^*(s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]$$
 
 Una forma común de estimar los valores óptimos de $Q$ es mediante el uso de programación dinámica, que implica actualizar una tabla en cada paso de tiempo. La actualización se realiza utilizando la siguiente iteración:
 
-$$
-Q^{new}(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(s_{t+1},a) - Q(s_t,a_t) \right]
-$$
+$$Q^{new}(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$$
 
 Donde $`\alpha`$ es la tasa de aprendizaje, un parámetro que controla la rapidez con la que los valores de $`Q`$ convergen hacia los óptimos. Este proceso se repite hasta que los valores de $`Q`$ converjan o hasta que se alcance un cierto número de iteraciones.
 
