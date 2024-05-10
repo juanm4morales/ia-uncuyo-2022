@@ -47,11 +47,11 @@ Se simularán al menos tres escenarios diferentes de tráfico. Como ocurre en la
 
 ### MDP
 
-El entorno se modelará mediante un Markov Decision Process (MDP). La cuadrupla <$\mathcal{S}$,$\mathcal{A}$,$\mathcal{P}$,$\mathcal{R}$>, dónde S denota el espacio de estados, A es el espacio de acciones, P es la matriz de probabilidad de transición de estado, y R es la función de recompensa.
+El entorno se modelará mediante un Markov Decision Process (MDP). La cuadrupla <$`\mathcal{S}`$,$`\mathcal{A}`$,$`\mathcal{P}`$,$`\mathcal{R}`$>, dónde S denota el espacio de estados, A es el espacio de acciones, P es la matriz de probabilidad de transición de estado, y R es la función de recompensa.
 
 #### Estados
 
-Un estado $s \in \mathcal{S}$ se compone de 3 componentes:
+Un estado $`s \in \mathcal{S}`$ se compone de 3 componentes:
 
 - Fase actual del semáforo (8 o 10 valores). 
 - Cantidad de vehículos detenidos **por cada calle** o **carril** (3 a 10 valores/intervalos). En el caso de la intersección utilizada, serían 4.
@@ -61,29 +61,29 @@ Tanto la cantidad de vehículos detenidos, como el tiempo de espera promedio req
 
 
 #### Acciones
-El agente controlador de semáforos necesita seleccionar una acción apropiada al estado de tráfico actual de la intersección. Una acción $a \in \mathcal{A}$ puede tomar los siguientes valores:
+El agente controlador de semáforos necesita seleccionar una acción apropiada al estado de tráfico actual de la intersección. Una acción $`a \in \mathcal{A}`$ puede tomar los siguientes valores:
 
-1) $rrrrGGGrrrrrGGGr$
-2) $GGGrrrrrGGGrrrrr$
-3) $rrrrrrrrrrrrGGGG$
-4) $GGGGrrrrrrrrrrrr$
-5) $rrrrGGGGrrrrrrrr$
-6) $rrrrrrrrGGGGrrrr$
-7) $rrrrGGGgrrrrGGGg$
-8) $GGGgrrrrGGGgrrrr$
+1) $`rrrrGGGrrrrrGGGr`$
+2) $`GGGrrrrrGGGrrrrr`$
+3) $`rrrrrrrrrrrrGGGG`$
+4) $`GGGGrrrrrrrrrrrr`$
+5) $`rrrrGGGGrrrrrrrr`$
+6) $`rrrrrrrrGGGGrrrr`$
+7) $`rrrrGGGgrrrrGGGg`$
+8) $`GGGgrrrrGGGgrrrr`$
 
 ![Fases posibles del semáforo](./images/phases.png)
 
 Cuando se elije la próxima acción, el paso previo al cambio es: transicionar a la correspondiente **fase amarilla**. Siguiendo la enumeración anterior de cada fase posible, estas son las correspondientes fases amarillas:
 
-1) $rrrryyyrrrrryyyr$
-2) $yyyrrrrryyyrrrrr$
-3) $rrrrrrrrrrrryyyy$
-4) $yyyyrrrrrrrrrrrr$
-5) $rrrryyyyrrrrrrrr$
-6) $rrrrrrrryyyyrrrr$
-7) $rrrryyyyrrrryyyy$
-8) $yyyyrrrryyyyrrrr$
+1) $`rrrryyyrrrrryyyr`$
+2) $`yyyrrrrryyyrrrrr`$
+3) $`rrrrrrrrrrrryyyy`$
+4) $`yyyyrrrrrrrrrrrr`$
+5) $`rrrryyyyrrrrrrrr`$
+6) $`rrrrrrrryyyyrrrr`$
+7) $`rrrryyyyrrrryyyy`$
+8) $`yyyyrrrryyyyrrrr`$
 
 Cada caracter/letra de una estado (también acción) de una fase describe el estado de una señal del semáforo. Tenga en cuenta que un mismo carril puede contener varias señales, por ejemplo, una para los vehículos que giran a la izquierda y otra para los que siguen recto. Esto significa que una señal no controla carriles, sino **enlaces**, cada uno de los cuales conecta un carril que entra en un cruce con otro que sale de él.
 
@@ -100,13 +100,13 @@ A continuación, una descripción de cada señal posible:
 
 
 #### Función de Recompensa
-Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $N_l$ la cantidad de vehículos detenidos en el carril $l$, y $w_{l_i}$ el tiempo de espera del vehículo $i$ en el carril $l$. $W_t$ es el tiempo total de espera en el instante $t$, definido como:
+Sea $`t`$ el instante de tiempo actual, $`L`$ la cantidad de carriles (o calles), $`N_l`$ la cantidad de vehículos detenidos en el carril $`l`$, y $`w_{l_i}`$ el tiempo de espera del vehículo $i$ en el carril $`l`$. $`W_t`$ es el tiempo total de espera en el instante $`t`$, definido como:
 
 $$W_t = \sum_{l=1}^{L} \sum_{i=1}^{N_l} w_{l_i}$$
 
-Entonces, el tiempo de espera acumulado en el instante $t$ respecto al instante $t-1$ se calcula como:
+Entonces, el tiempo de espera acumulado en el instante $`t`$ respecto al instante $`t-1`$ se calcula como:
 
-$$ R_t = W_{t} - W_{t-1}$$
+$$R_t = W_{t} - W_{t-1}$$
 
 
 ### Agente Q-Learning
@@ -115,25 +115,19 @@ El proceso de Reinforcement Learning implica que el agente interactue con el ent
 
 La forma básica de la función de valor de acción se define mediante la ecuación:
 
-$$
-Q^{\pi}(s,a) = E \left[ r_{t} + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots \mid s_t = s, a_t = a, \pi \right]
-$$
+$$Q^{\pi}(s,a) = E \left[ r_{t} + \gamma r_{t+1} + \gamma^2 r_{t+2} + \ldots \mid s_t = s, a_t = a, \pi \right]$$
 
-Esto representa la expectativa de la suma de las recompensas futuras ponderadas por el factor de descuento $\gamma$. El factor de descuento ($0 \leq \gamma < 1$) indica cuánto se priorizan las recompensas futuras en comparación con las inmediatas. En general, se presta atención tanto a las recompensas inmediatas como a las futuras, aunque se les da menos peso a estas últimas.
+Esto representa la expectativa de la suma de las recompensas futuras ponderadas por el factor de descuento $`\gamma`$. El factor de descuento ($`0 \leq \gamma < 1`$) indica cuánto se priorizan las recompensas futuras en comparación con las inmediatas. En general, se presta atención tanto a las recompensas inmediatas como a las futuras, aunque se les da menos peso a estas últimas.
 
-Si el agente posee conocimiento sobre los valores de $Q$ para los estados futuros, puede elegir acciones de manera óptima. La política óptima $\pi^*$ seleccionará la acción que maximice la recompensa acumulada esperada. En otras palabras, en un estado dado $s$, el agente elegirá la acción $a$ que tenga el valor $Q$ más alto. Este valor óptimo de $Q$ se puede calcular recursivamente basándose en los valores óptimos de los estados futuros. Esto se conoce como la ecuación de Bellman para $Q$:
+Si el agente posee conocimiento sobre los valores de $`Q`$ para los estados futuros, puede elegir acciones de manera óptima. La política óptima $`\pi^*`$ seleccionará la acción que maximice la recompensa acumulada esperada. En otras palabras, en un estado dado $`s`$, el agente elegirá la acción $`a`$ que tenga el valor $`Q`$ más alto. Este valor óptimo de $`Q`$ se puede calcular recursivamente basándose en los valores óptimos de los estados futuros. Esto se conoce como la ecuación de Bellman para $`Q`$:
 
-$$
-Q^*(s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]
-$$
+$$Q^*(s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]$$
 
 Una forma común de estimar los valores óptimos de $Q$ es mediante el uso de programación dinámica, que implica actualizar una tabla en cada paso de tiempo. La actualización se realiza utilizando la siguiente iteración:
 
-$$
-Q^{new}(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(s_{t+1},a) - Q(s_t,a_t) \right]
-$$
+$$Q^{new}(s_t,a_t) = Q(s_t,a_t) + \alpha \left[ R_{t+1} + \gamma \max_a Q(s_{t+1},a) - Q(s_t,a_t) \right]$$
 
-Donde $\alpha$ es la tasa de aprendizaje, un parámetro que controla la rapidez con la que los valores de $Q$ convergen hacia los óptimos. Este proceso se repite hasta que los valores de $Q$ converjan o hasta que se alcance un cierto número de iteraciones.
+Donde $`\alpha`$ es la tasa de aprendizaje, un parámetro que controla la rapidez con la que los valores de $`Q`$ convergen hacia los óptimos. Este proceso se repite hasta que los valores de $`Q`$ converjan o hasta que se alcance un cierto número de iteraciones.
 
 
 ### Q-Table
@@ -142,22 +136,22 @@ La Q-table utilizada por el agente tendrá las siguientes dimensiones:
 
 $$(4^{h\_int}\cdot4^{w\_int}\cdot|\mathcal{A}|)\cdot|\mathcal{A}|$$
 
-dónde $h\_int$ y $w\_int$ son la cantidad de intervalos usados para discretizar *cantidad de vehiculos detenidos por carill* y *tiempos de espera promedio por carril*, respectivamente. $|\mathcal{A}|$ es la cantidad de fases posibles.
+dónde $`h\_int`$ y $`w\_int`$ son la cantidad de intervalos usados para discretizar *cantidad de vehiculos detenidos por carill* y *tiempos de espera promedio por carril*, respectivamente. $`|\mathcal{A}|`$ es la cantidad de fases posibles.
 
 Para localizar una fila (estado) en la tabla, es necesario aplicar una función de *hash* sobre los componentes que representan al estado observado.
 
 
 ### Estrategia Exploración/Explotación
 
-La estrategia $\epsilon$ Greedy es un método simple para balanceear la exploración y la explotación. El valor epsilon determina la probabilidad de optar por la exploración frente a la explotación de posibles soluciones.
+La estrategia $`\epsilon`$ Greedy es un método simple para balanceear la exploración y la explotación. El valor epsilon determina la probabilidad de optar por la exploración frente a la explotación de posibles soluciones.
 
-AL principio el valor $\epsilon$ es alto, significando que el agentes estará en un modo de explocaración. A medida que se explora el entorno, el valor $\epsilon$ se reduce, y el agente comienza a explotar el apredizaje previo del entorno.
+AL principio el valor $`\epsilon`$ es alto, significando que el agentes estará en un modo de explocaración. A medida que se explora el entorno, el valor $`\epsilon`$ se reduce, y el agente comienza a explotar el apredizaje previo del entorno.
 
 ### Parámetros a ajustar
-- $Δt$. Segundos en un paso de tiempo.
-- $\gamma$. Factor de descuento.
-- $\alpha$. Taza de aprendizaje. 
-- $N$. Cantidad de pasos de tiempo por episodio. En principio constará de $86400/Δt$ pasos, dónde $Δt$ es un parámetro que determina la cantidad de segundos simulados que transcurren entre cada paso. Un episodio transcurre en 24 horas de **tiempo simulado**.
+- $`Δt`$. Segundos en un paso de tiempo.
+- $`\gamma`$. Factor de descuento.
+- $`\alpha`$. Taza de aprendizaje. 
+- $`N`$. Cantidad de pasos de tiempo por episodio. En principio constará de $`86400/Δt`$ pasos, dónde $`Δt`$ es un parámetro que determina la cantidad de segundos simulados que transcurren entre cada paso. Un episodio transcurre en 24 horas de **tiempo simulado**.
 
 
 ### Métricas
