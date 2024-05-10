@@ -141,6 +141,26 @@ dónde $`h\_int`$ y $`w\_int`$ son la cantidad de intervalos usados para discret
 Para localizar una fila (estado) en la tabla, es necesario aplicar una función de *hash* sobre los componentes que representan al estado observado.
 
 
+### Codificación (discretización) de estados
+Si en cada carril hay una gran cantidad de vehículos el tamaño de la Q-table puede escalar mucho. Por eso, se utilizará un parámetro $I$ (Intervals), para gestionar el tamaño de la tabla. Sea $M$ la máxima cantidad de vehículos por carril, se cumple $I \leq M$.
+
+Se propondrán 2 funciones para discretizar:
+
+1.  Una función con intervalos regulares.
+$$ 
+    f(x, M, I) = \left\lfloor {(I-1) \over M}x \right\rfloor 
+$$
+2.  Una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario, el comportamiento se aproximará al lineal. Si la función anterior no codifica de forma adecuada para el aprendizaje, esta puede ser una buena alternativa. 
+
+    Justificación:  Cuando tenenemos 0, 1, 2, 3 o 4 vehículos puede tener sentido diferenciar estos valores, pero cuando hay 22, 23 o 24 vehículos, no existe gran diferencia en el contexto del estado de tráfico.
+    
+    Sea $L=\frac{I-1}{M}$,
+$$
+f(x, M, I) = \left\lfloor (1-L)  \frac{I}{\log_2 \left( \frac{M}{M L} + 1 \right)} \log_2 \left( \frac{x}{M L} + 1 \right)+ L^2 x \right\rfloor
+$$
+
+
+
 ### Estrategia Exploración/Explotación
 
 La estrategia $`\epsilon`$ Greedy es un método simple para balanceear la exploración y la explotación. El valor epsilon determina la probabilidad de optar por la exploración frente a la explotación de posibles soluciones.
