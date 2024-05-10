@@ -1,6 +1,7 @@
 import traci
 from sumolib import checkBinary
 from typing import Dict
+from util.discrete import discrete
 
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
@@ -50,7 +51,7 @@ class Lane:
         for vehicle in self.vehicles:
             queueLength += (vehicle.length + self.vehicleMinGap)
         return queueLength
-    """
+    
     
     def searchVehiclesByWaitingTime(self, maxTime):
         vehicleIds = traci.lane.getLastStepVehicleIDs(self.laneId)
@@ -62,7 +63,7 @@ class Lane:
                 vehiclesLongWait.append((vehicleId, vehicleWaitingTime))
         
         return vehiclesLongWait
-                
+    """
           
                     
 class TrafficLight:
@@ -71,22 +72,24 @@ class TrafficLight:
             self.state = state
             self.yellowTransition = yellowTransition
             
-        
     # n=north, s=south, e=east, w=weast, l=left turn allowed (without priority)
     # G=Green with priority, g=green without priority, y=yellow, r=red
-    PHASES = {'ns_sn_l':    Phase("GGGgrrrrGGGgrrrr", "yyyyrrrryyyyrrrr"),
+    PHASES = {'init':       Phase("rrrrrrrrrrrrrrrr", "rrrrrrrrrrrrrrrr"),
+              'ns_sn_l':    Phase("GGGgrrrrGGGgrrrr", "yyyyrrrryyyyrrrr"),
               'ew_we_l':    Phase("rrrrGGGgrrrrGGGg", "rrrryyyyrrrryyyy"),
               'sn':         Phase("rrrrrrrrGGGGrrrr", "rrrrrrrryyyyrrrr"),
               'ns':         Phase("GGGGrrrrrrrrrrrr", "yyyyrrrrrrrrrrrr"),
               'we':         Phase("rrrrrrrrrrrrGGGG", "rrrrrrrrrrrryyyy"),
               'ew':         Phase("rrrrGGGGrrrrrrrr", "rrrryyyyrrrrrrrr"),
               'ns_sn':      Phase("GGGrrrrrGGGrrrrr", "yyyrrrrryyyrrrrr"),
-              'ew_we':      Phase("rrrrGGGrrrrrGGGr", "rrrryyyrrrrryyyr")
+              'ew_we':      Phase("rrrrGGGrrrrrGGGr", "rrrryyyrrrrryyyr"),
+              # 'ne_sw':    Phase("rrrGrrrrrrrGrrrr", "rrryrrrrrrryrrrr"),
+              # 'wn_es':    Phase("rrrrrrrGrrrrrrrG", "rrrrrrryrrrrrrry")
               }
     
     def __init__(self, id, initialPhase, yellowTime, minGreenTime, maxGreenTime):
         self.id = id
-        self.currentPhase = initialPhase
+        self.currentPhase = self.PHASES[initialPhase]
         self.nextPhase = initialPhase
         self.yellowTime = yellowTime
         self.minGreenTime = minGreenTime
@@ -97,12 +100,13 @@ class TrafficLight:
         
     def update(self):
         if (self.currentPhase != self.nextPhase):
-            if self.yellow and self.currentPhaseTime > self.yellowTime:
-                traci.trafficlight.setRedYellowGreenState(0, self.nextPhase)
+            if (self.yellow and self.currentPhaseTime > self.yellowTime) or not self.yellow:
+                nextPhaseState = self.PHASES[self.nextPhase].state
+                traci.trafficlight.setRedYellowGreenState(0, nextPhaseState)
                 self.currentPhase = self.nextPhase
                 self.currentPhaseTime = 0
                 self.yellow = False
-                
+
         traci.simulationStep() 
         self.currentPhaseTime += 1
     
@@ -112,13 +116,15 @@ class TrafficLight:
     def changePhase(self, newPhase):
         if (self.currentPhase != newPhase):
             if self.canChange():
-                yellowPhase = self.PHASES[self.currentPhase].yellowTransition
-                traci.trafficlight.setRedYellowGreenState(0, yellowPhase)
-                self.yellow = True
-                self.currentPhase = yellowPhase
+                if (self.currentPhase != "init"):  
+                    yellowPhaseState = self.PHASES[self.currentPhase].yellowTransition
+                    traci.trafficlight.setRedYellowGreenState(0, yellowPhaseState)
+                    self.yellow = True
+                    
                 previousPhaseTime = self.currentPhaseTime
                 self.currentPhaseTime = 0
-                self.nextPhase = self.PHASES[newPhase].state
+                self.nextPhase = newPhase
+                    
                 return previousPhaseTime
             else:
                 # No ha pasado el mínimo de tiempo de duración de la fase
@@ -128,35 +134,27 @@ class TrafficLight:
             return -2
 
 class State:
-    def __init__(self, tlPhase, lanes: Dict[str, Lane]):
+    def __init__(self, tlPhase, lanes: Dict[str, Lane], discreteClass):
         self.tlPhase = tlPhase
         self.discreteLaneQueue = self.discretizeLaneInfo(lanes)
+        self.discreteClass = discreteClass
+        
+    def getTupleState(self):
+        return (self.tlPhase, self.discreteLaneQueue)
     
     def discretizeLaneInfo(self, lanes: Dict[str, Lane]):
         discreteLaneQueue: Dict[str, int] = {}
         for laneId, lane in lanes.items():
-            discreteLaneQueue[laneId] = self.getQueueLengthCategory(lane.haltedVehicleAmount)
+            discreteLaneQueue[laneId] = self.discrete.log_interval(lane.haltedVehicleAmount)
         return discreteLaneQueue
-            
-    def getQueueLengthCategory(self, queueAmount):
-        if 0 <= queueAmount < 2:
-            return 0
-        if 2 <= queueAmount < 6:
-            return 1
-        if 6 <= queueAmount < 10:
-            return 2
-        if queueAmount >= 10:
-            return 3
         
-
-
 class SumoEnviroment:
     INTERSECTION_SIZE=4
     
-    def __init__(self, sumocfgFile, deltaTime, yellowTime, minGreenTime, maxGreenTime, gui):
+    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=3, minGreenTime=5, maxGreenTime=60, gui=False):
         self.sumocfgFile = sumocfgFile
         self.deltaTime = deltaTime
-        self.trafficLight = TrafficLight("rrrrrrrrrrrrrrrr", yellowTime, minGreenTime, maxGreenTime)
+        self.trafficLight = TrafficLight("init", yellowTime, minGreenTime, maxGreenTime)
         self.gui = gui
         tls_ids = traci.trafficlight.getIDList()
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
@@ -169,32 +167,38 @@ class SumoEnviroment:
                 edgeId = traci.lane.getEdgeID(laneId)                     # aristas
                 if edgeId not in self.edges:                              # aristas
                     self.edges[edgeId] = Lane(traci.lane.getLength(lane)) # aristas
-                #self.lanes[lane] = Lane(traci.lane.getLength(lane))    # carriles   
+                # self.lanes[lane] = Lane(traci.lane.getLength(lane))     # carriles   
             
         if gui:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
             self.sumoBinary = checkBinary("sumo")
-            
+        
+        self.discreteClass = discrete(6, 32)
+        
     @property
     def observationSpace(self):
         return self.trafficLight.PHASES.keys()
-    
-        
+       
     def initializeSimulation(self):
         sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile, "--tripinfo-output", "tripinfo.xml"]
         traci.start(sumoCMD)
-        
-    
-        
+           
     def getCurrentState(self):
-        return State(self.trafficLight.currentPhase, self.edges)
+        state = State(self.trafficLight.currentPhase, self.edges, self.discreteClass)
+        return state.getTupleState()
+    
+    def validAction(self, action):
+        currentPhaseTime = self.trafficLight.currentPhaseTime
+        
+        return (currentPhaseTime>self.trafficLight.minGreenTime 
+                & currentPhaseTime>self.trafficLight.yellowTime)
     
     def step(self, action):
-        
+        previousPhaseTime = 0
         # TOMAR ACCIÓN
         if self.validAction(action):
-            self.trafficLight.changePhase(action)
+            previousPhaseTime = self.trafficLight.changePhase(action)
             
         # PASO DE TIEMPO (deltaTime)   
         for _ in range(self.deltaTime):
@@ -206,7 +210,10 @@ class SumoEnviroment:
         state = self.getCurrentState()
         reward = self.computeReward()
         
-        return state, reward
+    
+    def reset(self):
+        return null
+        
         
     
                 
