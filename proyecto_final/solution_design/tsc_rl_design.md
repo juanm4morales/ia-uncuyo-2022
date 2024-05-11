@@ -121,7 +121,7 @@ Esto representa la expectativa de la suma de las recompensas futuras ponderadas 
 
 Si el agente posee conocimiento sobre los valores de $`Q`$ para los estados futuros, puede elegir acciones de manera óptima. La política óptima $`\pi^*`$ seleccionará la acción que maximice la recompensa acumulada esperada. En otras palabras, en un estado dado $`s`$, el agente elegirá la acción $`a`$ que tenga el valor $`Q`$ más alto. Este valor óptimo de $`Q`$ se puede calcular recursivamente basándose en los valores óptimos de los estados futuros. Esto se conoce como la ecuación de Bellman para $`Q`$:
 
-$$Q^*(s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]$$
+$$Q^* (s,a) = E \left[ r_{t+1} + \gamma \max_{a'} Q^*(s_{t+1},a') \mid s_t = s, a_t = a \right]$$
 
 Una forma común de estimar los valores óptimos de $Q$ es mediante el uso de programación dinámica, que implica actualizar una tabla en cada paso de tiempo. La actualización se realiza utilizando la siguiente iteración:
 
@@ -147,16 +147,19 @@ Si en cada carril hay una gran cantidad de vehículos el tamaño de la Q-table p
 Se propondrán 2 funciones para discretizar:
 
 1.  Una función con intervalos regulares.
+   
 $$ 
-    f(x, M, I) = \left\lfloor {(I-1) \over M}x \right\rfloor 
-$$
+    f(x, M, I) = \left \lfloor  \frac{(I-1)} {M} x \right \rfloor 
+$$  
+
 2.  Una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario, el comportamiento se aproximará al lineal. Si la función anterior no codifica de forma adecuada para el aprendizaje, esta puede ser una buena alternativa. 
 
     Justificación:  Cuando tenenemos 0, 1, 2, 3 o 4 vehículos puede tener sentido diferenciar estos valores, pero cuando hay 22, 23 o 24 vehículos, no existe gran diferencia en el contexto del estado de tráfico.
     
     Sea $L=\frac{I-1}{M}$,
+    
 $$
-f(x, M, I) = \left\lfloor (1-L)  \frac{I}{\log_2 \left( \frac{M}{M L} + 1 \right)} \log_2 \left( \frac{x}{M L} + 1 \right)+ L^2 x \right\rfloor
+    f(x, M, I) = \left \lfloor (1-L)  \frac{I} {\log_2 \left( \frac{M} {M L} + 1 \right)} \log_2 \left( \frac {x} {M L} + 1 \right)+ L^2 x \right \rfloor  
 $$
 
 
@@ -177,7 +180,11 @@ AL principio el valor $`\epsilon`$ es alto, significando que el agentes estará 
 ### Métricas
 Para evaluar el desempeño y aprendizaje del Q-Agent se utilarán las siguientes métricas:
 
-- Recompensa acumulada
+- Recompensa acumulada.
+ 
+$$
+G_{step} = \sum_{t=0}^{step} R_{t+1}
+$$
 
 - Tiempo de espera promedio
 
