@@ -148,7 +148,7 @@ Se propondrán 2 funciones para discretizar:
 
 1.  Una función con intervalos regulares.
 $$ 
-    f(x, M, I) = \left\lfloor {(I-1) \over M}x \right\rfloor 
+    f(x, M, I) = \left\lfloor \frac{(I-1)}{M}x \right\rfloor 
 $$
 2.  Una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario, el comportamiento se aproximará al lineal. Si la función anterior no codifica de forma adecuada para el aprendizaje, esta puede ser una buena alternativa. 
 
@@ -156,9 +156,8 @@ $$
     
     Sea $L=\frac{I-1}{M}$,
 $$
-f(x, M, I) = \left\lfloor (1-L)  \frac{I}{\log_2 \left( \frac{M}{M L} + 1 \right)} \log_2 \left( \frac{x}{M L} + 1 \right)+ L^2 x \right\rfloor
+f(x, M, I) = \left \lfloor (1-L)  \frac{I}{\log_2 \left( \frac{M}{M L} + 1 \right)} \log_2 \left( \frac{x}{M L} + 1 \right)+ L^2 x \right \rfloor
 $$
-
 
 
 ### Estrategia Exploración/Explotación
