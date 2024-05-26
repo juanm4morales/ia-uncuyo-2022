@@ -8,6 +8,8 @@ from sumolib import checkBinary
 from typing import Dict
 from util.discrete import Discrete
 
+import random
+
 if 'SUMO_HOME' in os.environ:
     tools = os.path.join(os.environ['SUMO_HOME'], 'tools')
     sys.path.append(tools)
@@ -103,25 +105,22 @@ class TrafficLight:
         
     def update(self):
         if (self.currentPhase != self.nextPhase):
-            if (self.yellow and self.currentPhaseTime > self.yellowTime) or not self.yellow:
+            if (self.yellow and self.currentPhaseTime >= self.yellowTime) or not self.yellow:
                 nextPhaseState = self.PHASES[self.nextPhase].state
                 traci.trafficlight.setRedYellowGreenState(0, nextPhaseState)
                 self.currentPhase = self.nextPhase
                 self.currentPhaseTime = 0
                 self.yellow = False
                 
-        ''' Considerar pasarle el deltaTime como arg
-        
-            simulationStep(float) -> None
-            Make a simulation step and simulate up to the given second in sim time.
-            If the given value is 0 or absent, exactly one step is performed.
-            Values smaller than or equal to the current sim time result in no action.
-        '''
         traci.simulationStep() 
         self.currentPhaseTime += 1
     
     def canChange(self):
-        return not(self.yellow) and (self.currentPhaseTime >= self.minGreenTime)
+        return (
+            not(self.yellow)
+            and (self.currentPhaseTime >= self.minGreenTime)
+            and (self.currentPhaseTime>=self.yellowTime)
+            )
     
     def changePhase(self, newPhase):
         if (self.currentPhase != newPhase):
@@ -149,34 +148,36 @@ class State:
         self.tlPhase = tlPhase
         self.discreteLaneQueue = self.discretizeLaneInfo(lanes)
         
-        
     def getTupleState(self):
-        return (self.tlPhase, self.discreteLaneQueue)
+        return (self.tlPhase, *self.discreteLaneQueue)
     
     def discretizeLaneInfo(self, lanes: Dict[str, Lane]):
-        discreteLaneQueue: Dict[str, int] = {}
-        for laneId, lane in lanes.items():
-            discreteLaneQueue[laneId] = self.discreteClass.log_interval(lane.lastStepHaltedVehicles)
+        # discreteLaneQueue: Dict[str, int] = {}
+        discreteLaneQueue = []
+        for lane in lanes.values():
+            discreteLaneQueue.append(self.discreteClass.log_interval(lane.lastStepHaltedVehicles))
         return discreteLaneQueue
         
-class SumoEnviroment:
+class SumoEnvironment:
     INTERSECTION_SIZE=4
     
-    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=3, minGreenTime=5, maxGreenTime=60, gui=False):
+    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=2, minGreenTime=5, maxGreenTime=60, gui=False):
         self.sumocfgFile = sumocfgFile
         self.gui = gui
+        
         if gui:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
             self.sumoBinary = checkBinary("sumo")
+            
         self.initializeSimulation()
         self.deltaTime = deltaTime
         tls_ids = traci.trafficlight.getIDList()
+        
+        assert(yellowTime < deltaTime)
         self.trafficLight = TrafficLight(tls_ids[0], "init", yellowTime, minGreenTime, maxGreenTime)
         self.previousStepHaltedVehicles = 0
-        
-        print(self.gui)
-        
+                
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
 
         # self.lanes = {} # Usar carriles
@@ -188,15 +189,12 @@ class SumoEnviroment:
                 if edgeId not in self.edges:                              # aristas
                     self.edges[edgeId] = Lane(edgeId, traci.lane.getLength(laneId)) # aristas
                 # self.lanes[lane] = Lane(traci.lane.getLength(lane))     # carriles   
-            
-        
-        
+
         self.discreteClass = Discrete(6, 32)
 
-        
     @property
     def actionSpace(self):
-        return self.trafficLight.PHASES.keys()
+        return [actionKey for actionKey in self.trafficLight.PHASES if actionKey != 'init']
        
     def initializeSimulation(self):
         sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile,
@@ -205,7 +203,7 @@ class SumoEnviroment:
         if self.gui:
             sumoCMD.append("-S")
         traci.start(sumoCMD)
-           
+          
     def getCurrentState(self):
         state = State(self.trafficLight.currentPhase, self.edges, self.discreteClass)
         return state.getTupleState()
@@ -215,21 +213,22 @@ class SumoEnviroment:
         
     
     def computeReward(self):
-        return self.previousStepHaltedVehicles-self.getTotalHaltedVehicles()
-    
+        currentStepHaltedVehicles = self.getTotalHaltedVehicles()
+        reward = self.previousStepHaltedVehicles-currentStepHaltedVehicles
+        self.previousStepHaltedVehicles = currentStepHaltedVehicles
+        return reward
+
+    # Deprecated 
     def validAction(self, action):
         currentPhaseTime = self.trafficLight.currentPhaseTime
-        print()
         return ((currentPhaseTime>self.trafficLight.minGreenTime 
-                and currentPhaseTime>self.trafficLight.yellowTime)
+                and currentPhaseTime>=self.trafficLight.yellowTime)
                 or (traci.simulation.getTime()==0))
     
     def step(self, action):
-        previousPhaseTime = 0
+        # previousPhaseTime = 0
         # TOMAR ACCIÓN
-        if self.validAction(action):
-            previousPhaseTime = self.trafficLight.changePhase(action)
-            
+        self.trafficLight.changePhase(action)
         # PASO DE TIEMPO (deltaTime)   
         for _ in range(self.deltaTime):
             self.trafficLight.update()
@@ -238,10 +237,35 @@ class SumoEnviroment:
             edge.update()
         
         state = self.getCurrentState()
+        # print(state)
+        # print(action)
         reward = self.computeReward()
-        done = traci.simulation.getMinExpectedNumber() > 0
-        
+        done = traci.simulation.getMinExpectedNumber() == 0
         return state, reward, done
         
     def reset(self):
-        traci.load(["-c", self.sumocfgFile])
+        
+        traci.load(['-c', self.sumocfgFile])
+        self.trafficLight.yellow = False
+        self.trafficLight.currentPhase = "init"
+        self.trafficLight.nextPhase = "init"
+        self.trafficLight.currentPhaseTime = 0
+
+        self.previousStepHaltedVehicles = 0
+        
+        for edgeKey in self.edges:
+            self.edges[edgeKey].lastStepHaltedVehicles = 0
+            self.edges[edgeKey].waitingTime = 0
+            
+        
+'''
+env = SumoEnvironment("nets/2x2_intersection/interseccion.sumocfg", 5, 2, 4, 60, gui=True)
+
+print(env.trafficLight.PHASES.keys())
+print(env.trafficLight.PHASES.keys())
+print(env.trafficLight.PHASES.keys())
+
+while (True):
+    action = random.choice(list(env.trafficLight.PHASES.keys()))
+    state, reward, done = env.step(action)
+''' 
