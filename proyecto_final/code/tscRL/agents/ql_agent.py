@@ -4,11 +4,6 @@ import random
 import sys
 import os
 
-current_dir=os.path.dirname(__file__)
-parent_dir=os.path.dirname(current_dir)
-# sys.path.append(os.path.join(current_dir, './tscRL'))
-print(sys.path)
-
 class QLAgent:
     """
         Q Learning agent with epsilon greedy policy
