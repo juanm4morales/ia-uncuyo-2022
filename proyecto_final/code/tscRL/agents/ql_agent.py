@@ -1,6 +1,14 @@
 import numpy as np
 import random
 
+import sys
+import os
+
+current_dir=os.path.dirname(__file__)
+parent_dir=os.path.dirname(current_dir)
+# sys.path.append(os.path.join(current_dir, './tscRL'))
+print(sys.path)
+
 class QLAgent:
     """
         Q Learning agent with epsilon greedy policy
@@ -67,8 +75,9 @@ class QLAgent:
                     
                 self.currentState = newState
                 epsilon = self.endEpsilon + (self.startEpsilon - self.endEpsilon) * np.exp(-self.decayRate*step)
-                
+               
             self.enviroment.reset()
+        self.enviroment.close()
                                     
         return self.qTable
         
