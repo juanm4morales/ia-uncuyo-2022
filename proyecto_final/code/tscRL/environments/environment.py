@@ -1,12 +1,11 @@
 import sys
 import os
-current_dir=os.path.dirname(__file__)
-parent_dir=os.path.dirname(current_dir)
-sys.path.append(os.path.join(current_dir, '..'))
 import traci
 from sumolib import checkBinary
 from typing import Dict
-from util.discrete import Discrete
+import sys
+
+from tscRL.util.discrete import Discrete
 
 import random
 
@@ -15,6 +14,12 @@ if 'SUMO_HOME' in os.environ:
     sys.path.append(tools)
 else:
     sys.exit("please declare environment variable 'SUMO_HOME'")
+    
+
+state_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.states')
+os.makedirs(state_dir, exist_ok=True)
+HALTED = "halted"
+WAITING_TIME = "waitingTime"
 
 class Vehicle:
     def __init__(self, position, length, maxSpeed):
@@ -27,18 +32,23 @@ class Vehicle:
         self.waitingTime += deltaTime
         
 class Lane:
-    def __init__(self, laneId, laneLength):
+    def __init__(self, laneId, laneLength, edge=False):
         # self.vehicleMinGap = vehicleMinGap
         # self.vehicles = []
         self.laneId = laneId
         # self.laneLength = laneLength
         self.lastStepHaltedVehicles = 0
-        self.waitingTime = 0
+        self.lastStepWaitingTime = 0
+        self.edge = edge
         
     def update(self):
-        self.lastStepHaltedVehicles = traci.edge.getLastStepHaltingNumber(self.laneId)
-        self.waitingTime = traci.edge.getWaitingTime(self.laneId)
-        
+        if (self.edge):
+            self.lastStepHaltedVehicles = traci.edge.getLastStepHaltingNumber(self.laneId)
+            self.lastStepWaitingTime = traci.edge.getWaitingTime(self.laneId)
+        else:
+            self.lastStepHaltedVehicles = traci.lane.getLastStepHaltingNumber(self.laneId)
+            self.lastStepWaitingTime = traci.lane.getWaitingTime(self.laneId)
+    
     """
     # Para gestionar vehículo por vehículo
     def removeVehicle(self, amount=1):
@@ -70,7 +80,7 @@ class Lane:
         
         return vehiclesLongWait
     """          
-                    
+
 class TrafficLight:
     class Phase:
         def __init__(self, state, yellowTransition):
@@ -92,7 +102,7 @@ class TrafficLight:
               # 'wn_es':    Phase("rrrrrrrGrrrrrrrG", "rrrrrrryrrrrrrry")
               }
     
-    def __init__(self, id, initialPhase, yellowTime, minGreenTime, maxGreenTime):
+    def __init__(self, id, initialPhase, yellowTime, minGreenTime, maxGreenTime, phases = None):
         self.id = id
         self.currentPhase = "init"
         self.nextPhase = initialPhase
@@ -103,6 +113,9 @@ class TrafficLight:
         self.yellow = False
         self.currentPhaseTime = 0
         
+        if phases == None:
+            self.PHASES = phases
+            
     def update(self):
         if (self.currentPhase != self.nextPhase):
             if (self.yellow and self.currentPhaseTime >= self.yellowTime) or not self.yellow:
@@ -143,28 +156,40 @@ class TrafficLight:
             return -2
 
 class State:
-    def __init__(self, tlPhase, lanes: Dict[str, Lane], discreteClass):
+    def __init__(self, tlPhase, lanes: Dict[str, Lane], discreteClass, laneInfo="halted"):
         self.discreteClass = discreteClass
         self.tlPhase = tlPhase
-        self.discreteLaneQueue = self.discretizeLaneInfo(lanes)
-        
+        self.discreteLaneInfo = self.discretizeLaneInfo(lanes, laneInfo)
+
     def getTupleState(self):
-        return (self.tlPhase, *self.discreteLaneQueue)
+        return (self.tlPhase, *self.discreteLaneInfo)
     
-    def discretizeLaneInfo(self, lanes: Dict[str, Lane]):
+    def discretizeLaneInfo(self, lanes: Dict[str, Lane], laneInfo):
         # discreteLaneQueue: Dict[str, int] = {}
-        discreteLaneQueue = []
-        for lane in lanes.values():
-            discreteLaneQueue.append(self.discreteClass.log_interval(lane.lastStepHaltedVehicles))
-        return discreteLaneQueue
+        discreteLaneInfo = []
+        if laneInfo == "waitingTime":
+            for lane in lanes.values():
+                discreteLaneInfo.append(self.discreteClass.log_interval(lane.lastStepWaitingTime))
+            return discreteLaneInfo
+        else:
+            for lane in lanes.values():
+                discreteLaneInfo.append(self.discreteClass.log_interval(lane.lastStepHaltedVehicles))
+            if laneInfo != "halted":
+                print("Warning: " + "Invalid laneInfo value = " + laneInfo + ". \"halted\" value was assigned instead.")
+            return discreteLaneInfo   
+ 
+class Metrics:
+    def __init__(self):
+        self.reward = []                
         
 class SumoEnvironment:
-    INTERSECTION_SIZE=4
-    
-    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=2, minGreenTime=5, maxGreenTime=60, gui=False):
+
+    MAX_VEH_LANE = 32      # adjust according to lane length?
+    MAX_WAITING_TIME = 300 # Param?
+    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=2, minGreenTime=5, maxGreenTime=60, gui=False, edges=False, discreteIntervals=6, laneInfo="halted", rewardFn="diff_halted"):
         self.sumocfgFile = sumocfgFile
+        self.stateFile = os.path.join(state_dir, 'initialState.xml')
         self.gui = gui
-        
         if gui:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
@@ -175,22 +200,37 @@ class SumoEnvironment:
         tls_ids = traci.trafficlight.getIDList()
         
         assert(yellowTime < deltaTime)
-        self.trafficLight = TrafficLight(tls_ids[0], "init", yellowTime, minGreenTime, maxGreenTime)
+        self.trafficLight = TrafficLight(tls_ids[0], "init", yellowTime, minGreenTime, maxGreenTime, laneInfo)
+        
         self.previousStepHaltedVehicles = 0
+        self.previousStepWaitingTime = 0
                 
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
-
-        # self.lanes = {} # Usar carriles
-        self.edges: Dict[str, Lane] = {} # Usar aristas
+        self.lanes: Dict[str, Lane] = {}
         for laneId in lanesIds:
             if "in" in laneId:
-                # Carril de entrada
-                edgeId = traci.lane.getEdgeID(laneId)                     # aristas
-                if edgeId not in self.edges:                              # aristas
-                    self.edges[edgeId] = Lane(edgeId, traci.lane.getLength(laneId)) # aristas
-                # self.lanes[lane] = Lane(traci.lane.getLength(lane))     # carriles   
-
-        self.discreteClass = Discrete(6, 32)
+                if edges:
+                    laneId = traci.lane.getEdgeID(laneId) 
+                if laneId not in self.lanes:
+                    self.lanes[laneId] = Lane(laneId, traci.lane.getLength(laneId), edge = edges)
+        
+        if (laneInfo==WAITING_TIME):
+            self.discreteClass = Discrete(discreteIntervals, self.MAX_WAITING_TIME)
+        else:
+            if (edges):
+                self.discreteClass = Discrete(discreteIntervals, self.MAX_VEH_LANE*2)
+            else:
+                self.discreteClass = Discrete(discreteIntervals, self.MAX_VEH_LANE)
+        
+        if rewardFn in self.rewardFns.keys():
+            self.rewardFn = self.rewardFns[rewardFn]
+        else:
+            self.rewardFn = self.rewardFns["diff_halted"]
+            print("Warning: Invalid rewardFn value. \"diff_halted\" value was assigned instead.")
+            
+        self.metrics = Metrics()
+        
+        
 
     @property
     def actionSpace(self):
@@ -203,19 +243,31 @@ class SumoEnvironment:
         if self.gui:
             sumoCMD.append("-S")
         traci.start(sumoCMD)
+        traci.simulation.saveState(self.stateFile)
           
     def getCurrentState(self):
-        state = State(self.trafficLight.currentPhase, self.edges, self.discreteClass)
+        state = State(self.trafficLight.currentPhase, self.lanes, self.discreteClass)
         return state.getTupleState()
     
     def getTotalHaltedVehicles(self):
-        return sum(edge.lastStepHaltedVehicles for edge in self.edges.values())
-        
+        return sum(lanes.lastStepHaltedVehicles for lanes in self.lanes.values())
+    
+    def getTotalWaitingTime(self):
+        return sum(lanes.lastStepWaitingTime for lanes in self.lanes.values())
     
     def computeReward(self):
+        return self.rewardFn(self)
+    
+    def diffHalted(self):
         currentStepHaltedVehicles = self.getTotalHaltedVehicles()
         reward = self.previousStepHaltedVehicles-currentStepHaltedVehicles
         self.previousStepHaltedVehicles = currentStepHaltedVehicles
+        return reward
+
+    def diffWaitingTime(self):
+        currentWaitingTime = self.getTotalWaitingTime()
+        reward = self.previousStepWaitingTime-currentWaitingTime
+        self.previousStepWaitingTime = currentWaitingTime
         return reward
 
     # Deprecated 
@@ -233,39 +285,37 @@ class SumoEnvironment:
         for _ in range(self.deltaTime):
             self.trafficLight.update()
         
-        for edge in self.edges.values():
-            edge.update()
+        for lane in self.lanes.values():
+            lane.update()
         
         state = self.getCurrentState()
         # print(state)
         # print(action)
         reward = self.computeReward()
+        
+        self.metrics.reward.append(reward)
+        
         done = traci.simulation.getMinExpectedNumber() == 0
         return state, reward, done
         
     def reset(self):
         
-        traci.load(['-c', self.sumocfgFile])
         self.trafficLight.yellow = False
         self.trafficLight.currentPhase = "init"
         self.trafficLight.nextPhase = "init"
         self.trafficLight.currentPhaseTime = 0
 
         self.previousStepHaltedVehicles = 0
+        self.previousStepWaitingTime = 0
         
-        for edgeKey in self.edges:
-            self.edges[edgeKey].lastStepHaltedVehicles = 0
-            self.edges[edgeKey].waitingTime = 0
+        for laneKey in self.lanes:
+            self.lanes[laneKey].lastStepHaltedVehicles = 0
+            self.lanes[laneKey].waitingTime = 0
+
+        traci.simulation.loadState(self.stateFile)
+    
+    def close(self):
+        traci.close(False)
             
-        
-'''
-env = SumoEnvironment("nets/2x2_intersection/interseccion.sumocfg", 5, 2, 4, 60, gui=True)
-
-print(env.trafficLight.PHASES.keys())
-print(env.trafficLight.PHASES.keys())
-print(env.trafficLight.PHASES.keys())
-
-while (True):
-    action = random.choice(list(env.trafficLight.PHASES.keys()))
-    state, reward, done = env.step(action)
-''' 
+    rewardFns = {"diff_halted": diffHalted,
+                "diff_waitingTime": diffWaitingTime}
