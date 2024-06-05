@@ -51,15 +51,17 @@ class QLAgent:
         return action
     
     def train(self, episodes):
+        metrics = []
         for episode in range(episodes):
-            # Epsilon value with exponential decay 
+            # Epsilon value with exponential decay
             epsilon = self.startEpsilon
             step = 0
             done = False
             while not done:
                 action = self.epsilonGreedyPolicy(self.currentState, epsilon)
-                newState, reward, done = self.enviroment.step(action)
-                
+                newState, reward, done, info = self.enviroment.step(action)
+                info["episode"] = episode
+                metrics.append(info)
                 if newState not in self.qTable:
                     self.qTable[newState] = {action: 0 for action in self.enviroment.actionSpace}
             
@@ -70,9 +72,8 @@ class QLAgent:
                     
                 self.currentState = newState
                 epsilon = self.endEpsilon + (self.startEpsilon - self.endEpsilon) * np.exp(-self.decayRate*step)
-               
             self.enviroment.reset()
         self.enviroment.close()
                                     
-        return self.qTable
+        return metrics
         
