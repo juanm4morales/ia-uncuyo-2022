@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-04-17 22:04:50 by Eclipse SUMO netedit Version 1.19.0
+<!-- generated on 2024-06-14 23:38:27 by Eclipse SUMO netedit Version v1_20_0+0335-d2d5b9dde81
 <configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/neteditConfiguration.xsd">
 
     <input>
-        <sumocfg-file value="/home/juanma/Dev/ia-uncuyo-2022/proyecto_final/nets/2x2_intersection/interseccion.sumocfg"/>
-        <additional-files value=""/>
-        <route-files value="/home/juanma/Dev/ia-uncuyo-2022/proyecto_final/nets/2x2_intersection/routes.rou.xml"/>
+        <sumocfg-file value="/home/juanma/Dev/ia-uncuyo-2022/proyecto_final/nets/2x2_intersection/interseccion_test.sumocfg"/>
+        <route-files value="/home/juanma/Dev/ia-uncuyo-2022/proyecto_final/nets/2x2_intersection/routes_1_2x4changes.rou.xml"/>
         <sumo-net-file value="/home/juanma/Dev/ia-uncuyo-2022/proyecto_final/nets/2x2_intersection/interseccion.net.xml"/>
     </input>
 
@@ -35,7 +34,7 @@
 </configuration>
 -->
 
-<net version="1.16" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
+<net version="1.20" junctionCornerDetail="5" limitTurnSpeed="5.50" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/net_file.xsd">
 
     <location netOffset="0.00,0.00" convBoundary="0.00,-200.00,400.00,200.00" origBoundary="-10000000000.00,-10000000000.00,10000000000.00,10000000000.00" projParameter="!"/>
 
@@ -128,12 +127,23 @@
     <tlLogic id="0" type="static" programID="0" offset="0">
         <phase duration="60" state="rrrrrrrrrrrrrrrr"/>
     </tlLogic>
-
+    
     <tlLogic id="0" type="static" programID="1" offset="0">
+        <phase duration="10" state="rrrGrrrrrrrGrrrr" />
+        <phase duration="4" state="rrryrrrrrrryrrrr" />
+        <phase duration="30" state="GGGrrrrrGGGrrrrr" />
+        <phase duration="4" state="yyyrrrrryyyrrrrr" />
+        <phase duration="10" state="rrrrrrrGrrrrrrrG" />
+        <phase duration="4" state="rrrrrrryrrrrrrry" />
+        <phase duration="30" state="rrrrGGGrrrrrGGGr" />
+        <phase duration="4" state="rrrryyyrrrrryyyr" />
+    </tlLogic>
+
+    <tlLogic id="0" type="static" programID="2" offset="0">
         <phase duration="30" state="GGGgrrrrGGGgrrrr" />
-        <phase duration="3" state="yyyyrrrryyyyrrrr" />
+        <phase duration="4" state="yyyyrrrryyyyrrrr" />
         <phase duration="30" state="rrrrGGGgrrrrGGGg" />
-        <phase duration="3" state="rrrryyyyrrrryyyy" />
+        <phase duration="4" state="rrrryyyyrrrryyyy" />
     </tlLogic>
 
     <junction id="JC" type="traffic_light" x="200.00" y="0.00" incLanes="E_N_in_0 E_N_in_1 E_E_in_0 E_E_in_1 E_S_in_0 E_S_in_1 E_W_in_0 E_W_in_1" intLanes=":JC_0_0 :JC_1_0 :JC_1_1 :JC_16_0 :JC_4_0 :JC_5_0 :JC_5_1 :JC_17_0 :JC_8_0 :JC_9_0 :JC_9_1 :JC_18_0 :JC_12_0 :JC_13_0 :JC_13_1 :JC_19_0" shape="193.60,10.40 206.40,10.40 206.84,8.18 207.40,7.40 208.18,6.84 209.18,6.51 210.40,6.40 210.40,-6.40 208.18,-6.84 207.40,-7.40 206.84,-8.18 206.51,-9.18 206.40,-10.40 193.60,-10.40 193.16,-8.18 192.60,-7.40 191.82,-6.84 190.82,-6.51 189.60,-6.40 189.60,6.40 191.82,6.84 192.60,7.40 193.16,8.18 193.49,9.18">
