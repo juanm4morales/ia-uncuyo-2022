@@ -261,25 +261,26 @@ El mayor desafío de este método recae en la poca escalabilidad, ya que el rend
 
 El agente controlador de semáforos necesita selecciona una acción apropiada ante el estado de tráfico actual en la intersección. El conjunto de acciones disponibles para el agente está compuesto por todas las fases posibles que puede tomar un semáforo. Estas fases son las siguientes:
 
-1) $rrrrGGGrrrrrGGGr$
-2) $GGGrrrrrGGGrrrrr$
-3) $rrrrrrrrrrrrGGGG$
-4) $GGGGrrrrrrrrrrrr$
-5) $rrrrGGGGrrrrrrrr$
-6) $rrrrrrrrGGGGrrrr$
-7) $rrrrGGGgrrrrGGGg$
-8) $GGGgrrrrGGGgrrrr$
+
+1) 'ew_we': $rrrrGGGrrrrrGGGr$. Movimiento este-oeste y oeste-este, sin permiso de giro a la izquierda.
+2) 'ns_sn': $GGGrrrrrGGGrrrrr$. Movimiento norte-sur y sur-norte, sin permiso de giro a la izquierda.
+3) 'we': $rrrrrrrrrrrrGGGG$. Movimiento oeste-este, con permiso de giro a la izquierda.
+4) 'ns': $GGGGrrrrrrrrrrrr$. Movimiento norte-sur, con permiso de giro a la izquierda.
+5) 'ew': $rrrrGGGGrrrrrrrr$. Movimiento este-oeste, con permiso de giro a la izquierda.
+6) 'sn': $rrrrrrrrGGGGrrrr$. Movimiento sur-norte, con permiso de giro a la izquierda.
+7) 'ew_we_l': $rrrrGGGgrrrrGGGg$. Movimiento este-oeste y oeste-este, con permiso de giro a la izquierda.
+8) 'ns_sn_l': $GGGgrrrrGGGgrrrr$. Movimiento norte-sur y sur-norte, con permiso de giro a la izquierda.
 
 Una vez seleccionada la siguiente fase, el agente inicia una transición a la correspondiente fase amarilla. Esta fase sirve como una advertencia para los conductores que se aproximan a la intersección, indicando que la luz roja está a punto de activarse en su dirección. La duración de la fase amarilla está fijada en 4 segundos. Siguiendo la enumeración anterior, estas son las correspondientes fases amarillas:
 
-1) $rrrryyyrrrrryyyr$
-2) $yyyrrrrryyyrrrrr$
-3) $rrrrrrrrrrrryyyy$
-4) $yyyyrrrrrrrrrrrr$
-5) $rrrryyyyrrrrrrrr$
-6) $rrrrrrrryyyyrrrr$
-7) $rrrryyyyrrrryyyy$
-8) $yyyyrrrryyyyrrrr$
+1) 'ew_we': $rrrryyyrrrrryyyr$
+2) 'ns_sn': $yyyrrrrryyyrrrrr$
+3) 'we': $rrrrrrrrrrrryyyy$
+4) 'ns': $yyyyrrrrrrrrrrrr$
+5) 'ew': $rrrryyyyrrrrrrrr$
+6) 'sn': $rrrrrrrryyyyrrrr$
+7) 'ew_we_l' $rrrryyyyrrrryyyy$
+8) 'ns_sn_l' $yyyyrrrryyyyrrrr$
 
 Cada caracter de una fase describe una señal de movimiento del semáforo. En la [Tabla 3](#trafficSignal) se encuentra la descripción de cada señal. Para esta intersección en particular son 16 señales de movimiento (16 enlaces) y el orden de cada señal va en sentido horario. Comienza desde la señal que controla el enlace 0: carril entrante norte derecho ⟶ carril saliente oeste derecho y termina en el enlace 15: carril entrante oeste izquierdo ⟶ carril saliente norte izquierdo.
 
@@ -337,6 +338,11 @@ $$R_{t+1} = W_{t+1} - W_{t}$$
 ### Baseline
 
 ## Análisis y discusión de resultados
+### Exploración de parámetros
+### Resultados del entrenamiento
+#### Escenario balanceado
+#### Escenario desbalanceado
+### Comparación con baseline
 
 ## Conclusiones
 
