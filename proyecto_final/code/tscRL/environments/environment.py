@@ -47,39 +47,7 @@ class Lane:
             self.lastStepWaitingTime = traci.edge.getWaitingTime(self.laneId)
         else:
             self.lastStepHaltedVehicles = traci.lane.getLastStepHaltingNumber(self.laneId)
-            self.lastStepWaitingTime = traci.lane.getWaitingTime(self.laneId)
-    
-    """
-    # Para gestionar vehículo por vehículo
-    def removeVehicle(self, amount=1):
-        for i in range(amount):
-            vehicleRef = self.vehicles.pop(0)
-            del vehicleRef # Elimino la referencia, así el garbage collector de python lo elimina de memoria
-        
-    def getTotalWaitingTime(self):
-        return sum(vehicle.waitingTime for vehicle in self.vehicles)
-    
-    def getAvgWaitingTime(self):
-        return self.getTotalWaitingTime() / len(self.vehicles)
-    
-    def getQueueLength(self):
-        queueLength = 0
-        for vehicle in self.vehicles:
-            queueLength += (vehicle.length + self.vehicleMinGap)
-        return queueLength
-    
-    
-    def searchVehiclesByWaitingTime(self, maxTime):
-        vehicleIds = traci.lane.getLastStepVehicleIDs(self.laneId)
-        vehiclesLongWait = []
-        vehicleWaitingTime = 0
-        for vehicleId in vehicleIds:
-            vehicleWaitingTime = traci.vehicle.getWaitingTime(vehicleId)
-            if vehicleWaitingTime > maxTime:
-                vehiclesLongWait.append((vehicleId, vehicleWaitingTime))
-        
-        return vehiclesLongWait
-    """          
+            self.lastStepWaitingTime = traci.lane.getWaitingTime(self.laneId)  
 
 class TrafficLight:
     class Phase:
@@ -102,13 +70,12 @@ class TrafficLight:
               # 'wn_es':    Phase("rrrrrrrGrrrrrrrG", "rrrrrrryrrrrrrry")
               }
     
-    def __init__(self, id, initialPhase, yellowTime, minGreenTime, maxGreenTime, phases = None):
+    def __init__(self, id, initialPhase, yellowTime, minGreenTime, phases = None):
         self.id = id
         self.currentPhase = "init"
         self.nextPhase = initialPhase
         self.yellowTime = yellowTime
         self.minGreenTime = minGreenTime
-        self.maxGreenTime = maxGreenTime
 
         self.yellow = False
         self.currentPhaseTime = 0
@@ -179,35 +146,36 @@ class State:
             return discreteLaneInfo          
         
 class SumoEnvironment:
-
-    MAX_VEH_LANE = 32      # adjust according to lane length?
-    MAX_WAITING_TIME = 300 # Param?
-    def __init__(self, sumocfgFile, deltaTime=3, yellowTime=2, minGreenTime=5, maxGreenTime=60, gui=False, edges=False, discreteIntervals=6, laneInfo="halted", rewardFn="diff_halted", fixedTL=False):
+    MAX_VEH_LANE = 30      # adjust according to lane length? .. Before 32
+    MAX_WAITING_TIME = 500 # Param? .. Before 300
+    def __init__(self, sumocfgFile, deltaTime=5, yellowTime=4, minGreenTime=5, gui=False, edges=False, discreteIntervals=6, laneInfo="halted", rewardFn="diff_halted", fixedTL=False, simTime=43800, sumoLog=False):
         self.sumocfgFile = sumocfgFile
         self.stateFile = os.path.join(state_dir, 'initialState.xml')
         self.gui = gui
-        
         if gui:
             self.sumoBinary = checkBinary("sumo-gui")
         else:
             self.sumoBinary = checkBinary("sumo")
-            
-        self.initializeSimulation()
-        
-        self.deltaTime = deltaTime
-        tls_ids = traci.trafficlight.getIDList()
-        self.fixedTL=fixedTL
-        if self.fixedTL:
-            traci.trafficlight.setProgram(tls_ids[0], "1")
-        else:
-            traci.trafficlight.setProgram(tls_ids[0], "0")
-              
+        self.simTime = simTime
         assert(yellowTime < deltaTime)
-        self.trafficLight = TrafficLight(tls_ids[0], "init", yellowTime, minGreenTime, maxGreenTime, laneInfo)
-        
+        self.deltaTime = deltaTime
+        self.fixedTL=fixedTL
         self.haltedVehicles = 0
         self.waitingTime = 0
-                
+        if rewardFn in self.rewardFns.keys():
+            self.rewardFn = self.rewardFns[rewardFn]
+        else:
+            self.rewardFn = self.rewardFns["diff_halted"]
+            print("Warning: Invalid rewardFn value. \"diff_halted\" value was assigned instead.")
+        
+        self.sumoLog = sumoLog
+        
+        self.initializeSimulation()
+        
+        tls_ids = traci.trafficlight.getIDList()
+        
+        self.trafficLight = TrafficLight(tls_ids[0], "init", yellowTime, minGreenTime, laneInfo)
+                        
         lanesIds = traci.trafficlight.getControlledLanes(tls_ids[0])
         self.lanes: Dict[str, Lane] = {}
         for laneId in lanesIds:
@@ -217,19 +185,23 @@ class SumoEnvironment:
                 if laneId not in self.lanes:
                     self.lanes[laneId] = Lane(laneId, traci.lane.getLength(laneId), edge = edges)
         
-        if (laneInfo==WAITING_TIME):
-            self.discreteClass = Discrete(discreteIntervals, self.MAX_WAITING_TIME)
+        if (laneInfo == WAITING_TIME):
+            if (edges):
+                self.discreteClass = Discrete(discreteIntervals, self.MAX_WAITING_TIME*2)
+            else:
+                self.discreteClass = Discrete(discreteIntervals, self.MAX_WAITING_TIME)
         else:
             if (edges):
                 self.discreteClass = Discrete(discreteIntervals, self.MAX_VEH_LANE*2)
             else:
                 self.discreteClass = Discrete(discreteIntervals, self.MAX_VEH_LANE)
+                    
+        self.warmingUpSimulation()
         
-        if rewardFn in self.rewardFns.keys():
-            self.rewardFn = self.rewardFns[rewardFn]
+        if self.fixedTL:
+            traci.trafficlight.setProgram(tls_ids[0], "1")
         else:
-            self.rewardFn = self.rewardFns["diff_halted"]
-            print("Warning: Invalid rewardFn value. \"diff_halted\" value was assigned instead.")
+            traci.trafficlight.setProgram(tls_ids[0], "0")
 
     @property
     def simStep(self):
@@ -240,24 +212,50 @@ class SumoEnvironment:
         return [actionKey for actionKey in self.trafficLight.PHASES if actionKey != 'init']
        
     def initializeSimulation(self):
-        sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile,
+        sumoCMD = [self.sumoBinary, "-c", self.sumocfgFile
                    #"--tripinfo-output", "tripinfo.xml"
                    ]
+        
+        if not(self.sumoLog):
+            sumoCMD.append("--no-step-log")
+            sumoCMD.append("--no-warnings")
         if self.gui:
             sumoCMD.append("-S")
         
-        try:   
+        try:
             traci.start(sumoCMD)
-            traci.simulation.saveState(self.stateFile)
+            
         except traci.TraCIException as traci_e:
             print(traci_e, end="")
             print(" Closing connection...")
             traci.close()
+            import time
+            time.sleep(1)
             print(traci_e, end="")
             print(" Starting new connection...")
             traci.start(sumoCMD)
             print("OK")
-          
+    
+    def warmingUpSimulation(self):
+        traci.simulationStep(599) # Warming Time
+        traci.trafficlight.setRedYellowGreenState(0, self.trafficLight.PHASES["init"].state)
+        traci.simulationStep()
+        self.waitingTime = self.getTotalWaitingTime()
+        self.haltedVehicles = self.getTotalHaltedVehicles()
+        self.trafficLight.currentPhase = "init"
+        self.trafficLight.nextPhase = "init"
+        for lane in self.lanes.values():
+            lane.update()
+        traci.simulation.saveState(self.stateFile)
+        
+    def setTLProgram(self, programID: int):
+        try:
+            traci.trafficlight.setProgram(tls_ids[0], programID)
+        except traci.TraCIException as traci_e:
+            print(traci_e, end="")
+            print(" Program ID setted to 1.")
+            traci.trafficlight.setProgram(tls_ids[0], "1")
+            
     def getCurrentState(self):
         state = State(self.trafficLight.currentPhase, self.lanes, self.discreteClass)
         return state.getTupleState()
@@ -279,20 +277,18 @@ class SumoEnvironment:
 
     def diffWaitingTime(self):
         currentWaitingTime = self.getTotalWaitingTime()
-        reward = self.waitingTime-currentWaitingTime
+        reward = self.waitingTime - currentWaitingTime
         self.waitingTime = currentWaitingTime
         return reward
 
-    # Deprecated 
-    def validAction(self, action):
-        currentPhaseTime = self.trafficLight.currentPhaseTime
-        return ((currentPhaseTime>self.trafficLight.minGreenTime 
-                and currentPhaseTime>=self.trafficLight.yellowTime)
-                or (traci.simulation.getTime()==0))
-        
-
     def getInfo(self):        
-        # vehicleCount = traci.vehicle.getIDCount()
+        vehicleCount = traci.vehicle.getIDCount()
+        
+        if (self.rewardFn == self.rewardFns["diff_halted"]):
+            self.waitingTime = self.getTotalWaitingTime()
+        elif (self.rewardFn == self.rewardFns["diff_waitingTime"]):
+            self.haltedVehicles = self.getTotalHaltedVehicles()
+            
         meanWaitingTime = self.waitingTime / vehicleCount if vehicleCount > 0 else 0
         # vehicles = traci.vehicle.getIDList()
         # waiting_times = [traci.vehicle.getWaitingTime(vehicle) for vehicle in vehicles]
@@ -322,13 +318,13 @@ class SumoEnvironment:
         # print(state)
         # print(action)
         reward = self.computeReward()
-        
-        done = traci.simulation.getMinExpectedNumber() == 0
+
+        done = traci.simulation.getMinExpectedNumber() == 0 or traci.simulation.getTime() > self.simTime
+
         info = self.getInfo()
         return state, reward, done, info
         
     def reset(self):
-        
         self.trafficLight.yellow = False
         self.trafficLight.currentPhase = "init"
         self.trafficLight.nextPhase = "init"
@@ -340,8 +336,11 @@ class SumoEnvironment:
         for laneKey in self.lanes:
             self.lanes[laneKey].lastStepHaltedVehicles = 0
             self.lanes[laneKey].waitingTime = 0
-
+            
         traci.simulation.loadState(self.stateFile)
+        
+        self.waitingTime = self.getTotalWaitingTime()
+        self.haltedVehicles = self.getTotalHaltedVehicles()
     
     def close(self):
         traci.close(False)
