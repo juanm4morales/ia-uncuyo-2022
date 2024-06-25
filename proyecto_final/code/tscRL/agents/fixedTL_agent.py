@@ -6,7 +6,7 @@ import os
 
 class FixedTLAgent:
     """
-        Q Learning agent with epsilon greedy policy
+        Fixed TL agent
         
         Attributes:
             environment : SumoEnvironment
@@ -15,25 +15,35 @@ class FixedTLAgent:
                 Current state
     """
     
-    def __init__(self, enviroment):
-        enviroment.fixedTL = True
-        self.enviroment = enviroment
-        self.currentState = enviroment.getCurrentState()
+    def __init__(self, environment, episodes, programID=None):
+        environment.fixedTL = True
+        self.environment = environment
+        self.currentState = environment.getCurrentState()
+        self.episodes = episodes
+        if programID != None:
+            self.environment.setTLProgram(programID)
         
-    def run(self, episodes):
+    def run(self):
         metrics = []
-        for episode in range(episodes):
+        for episode in range(self.episodes):
+            print("episode: " + str(episode+1))
             step = 0
             done = False
+            cumulativeReward = 0
+            meanWaitingTimeSum = 0
             while not done:
-                newState, reward, done, info = self.enviroment.step()
-                info["episode"] = episode
-                metrics.append(info)
+                newState, reward, done, info = self.environment.step()
+                cumulativeReward = cumulativeReward + reward
+                meanWaitingTimeSum += info["mean_waiting_time"]
                 if done:
                     break        
                 self.currentState = newState
-            self.enviroment.reset()
-        self.enviroment.close()
-        
+                step += 1
+                
+            self.environment.reset()
+            meanWaitingTime = meanWaitingTimeSum/step
+            metrics.append({"episode": episode, "cumulative_reward": cumulativeReward, "mean_waiting_time": meanWaitingTime})
+            
+        self.environment.close()
         return metrics
         
