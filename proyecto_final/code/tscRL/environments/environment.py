@@ -162,6 +162,8 @@ class SumoEnvironment:
         self.fixedTL=fixedTL
         self.haltedVehicles = 0
         self.waitingTime = 0
+        self.cumulativeWaitingTime = 0
+        
         if rewardFn in self.rewardFns.keys():
             self.rewardFn = self.rewardFns[rewardFn]
         else:
@@ -199,7 +201,7 @@ class SumoEnvironment:
         self.warmingUpSimulation()
         
         if self.fixedTL:
-            traci.trafficlight.setProgram(tls_ids[0], "1")
+            traci.trafficlight.setProgram(tls_ids[0], "2")
         else:
             traci.trafficlight.setProgram(tls_ids[0], "0")
 
@@ -269,6 +271,14 @@ class SumoEnvironment:
     def computeReward(self):
         return self.rewardFn(self)
     
+    def getAccumulatedWaitingTime(self):
+        accumulatedWaitingTime = 0
+        for lane in self.lanes.values():
+            vehicles = traci.lane.getLastStepVehicleIDs(lane.laneId)
+            for vehicle in vehicles:
+                accumulatedWaitingTime += traci.vehicle.getAccumulatedWaitingTime(vehicle)
+        return accumulatedWaitingTime
+    
     def diffHalted(self):
         currentStepHaltedVehicles = self.getTotalHaltedVehicles()
         reward = self.haltedVehicles-currentStepHaltedVehicles
@@ -281,10 +291,16 @@ class SumoEnvironment:
         self.waitingTime = currentWaitingTime
         return reward
 
+    def diffAccumulatedWaitingTime(self):
+        currentAccWaitingTime = self.getAccumulatedWaitingTime()
+        reward = self.cumulativeWaitingTime - currentAccWaitingTime
+        self.cumulativeWaitingTime = currentAccWaitingTime
+        return reward
+
     def getInfo(self):        
         vehicleCount = traci.vehicle.getIDCount()
         
-        if (self.rewardFn == self.rewardFns["diff_halted"]):
+        if (self.rewardFn in [self.rewardFns["diff_halted"], self.rewardFns["diff_cumulativeWaitingTime"]]):
             self.waitingTime = self.getTotalWaitingTime()
         elif (self.rewardFn == self.rewardFns["diff_waitingTime"]):
             self.haltedVehicles = self.getTotalHaltedVehicles()
@@ -318,7 +334,8 @@ class SumoEnvironment:
         # print(state)
         # print(action)
         reward = self.computeReward()
-
+        
+    
         done = traci.simulation.getMinExpectedNumber() == 0 or traci.simulation.getTime() > self.simTime
 
         info = self.getInfo()
@@ -332,6 +349,7 @@ class SumoEnvironment:
 
         self.haltedVehicles = 0
         self.waitingTime = 0
+        self.cumulativeWaitingTime = 0
         
         for laneKey in self.lanes:
             self.lanes[laneKey].lastStepHaltedVehicles = 0
@@ -346,4 +364,5 @@ class SumoEnvironment:
         traci.close(False)
             
     rewardFns = {"diff_halted": diffHalted,
-                "diff_waitingTime": diffWaitingTime}
+                "diff_waitingTime": diffWaitingTime,
+                "diff_cumulativeWaitingTime": diffAccumulatedWaitingTime}
