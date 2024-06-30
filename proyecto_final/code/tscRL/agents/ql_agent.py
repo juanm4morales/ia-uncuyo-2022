@@ -1,5 +1,6 @@
 import numpy as np
 import random
+from time import time
 
 import sys
 import os
@@ -65,6 +66,7 @@ class QLAgent:
             done = False
             cumulativeReward = 0
             meanWaitingTimeSum = 0
+            startTime = time()
             while not done:
                 action = self.epsilonGreedyPolicy(self.currentState, epsilon)
                 newState, reward, done, info = self.environment.step(action)
@@ -85,7 +87,9 @@ class QLAgent:
                 
             self.environment.reset()
             meanWaitingTime = meanWaitingTimeSum/step
-            metrics.append({"episode": episode, "cumulative_reward": cumulativeReward, "mean_waiting_time": meanWaitingTime})
+            # print(cumulativeReward)
+            endTime = time()
+            metrics.append({"episode": episode, "cumulative_reward": cumulativeReward, "mean_waiting_time": meanWaitingTime, "elapsed_time": endTime-startTime})
     
         self.environment.close()                     
         return metrics
