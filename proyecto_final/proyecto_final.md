@@ -693,21 +693,21 @@ Se realizaron 15 ejecuciones de entrenamiento del agente sobre el entorno desbal
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode">
   <img src="./images/MeanWaitingTimePerEpisode.png" alt="MWTPerEpisode" width="800" height="auto">
-  <p><i>Figura 25:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre 200 episodios, sobre un escenario desbalanceado. Se muestran la media y desviación estándar de las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 25:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 La [Figura 25](MWTPerEpisode) muestra como, a partir del episodio 150, el tiempo de espera promedio, disminuye a lo que parece su límite inferior de la métrica. La figura demuestra que el agente Q-learning a logrado conocer una política de gestión de tráfico bastante superior a que la que utiliza en los primeros episodios (simulaciones).
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CRPerEpisode">
   <img src="./images/CRPerEpisode.png" alt="CRPerEpisode" width="800" height="auto">
-  <p><i>Figura 26:</i> Recompensa acumulada del agente Q-Learning, sobre 200 episodios, sobre un escenario desbalanceado. Se muestran la media y desviación estándar de las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 26:</i> Recompensa acumulada del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 Como se mencionó previamente, en la [Figura 26](CRPerEpisode) se observa como la recompensa oscila bruscamente alrededor del 0. A medida que transcurren los episodios, la amplitud de esta oscilación disminuye, lo cual demuestra junto al gráfico anterior, que utilizando la función de recompensa de la **diferencia de la suma en los tiempos de espera**, la recompensa acumulada tiende a estabilizarse hacia el 0. Sin embargo, por la naturaleza de esta función de recompensa, esta métrica no nos resultó útil para evaluar el rendimiento de este sistema en particular.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EEPerEpisode">
   <img src="./images/EEPerEpisode.png" alt="EEPerEpisode" width="800" height="auto">
-  <p><i>Figura 27:</i> Tiempo transcurrido del agente Q-Learning, sobre 200 episodios, sobre un escenario desbalanceado. Se muestran la media y desviación estándar de las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 27:</i> Tiempo transcurrido del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 
@@ -715,9 +715,29 @@ En la [Figura 27](EEPerEpisode) se observa una característica inherente del sim
 
 #### Escenario balanceado
 
+### Agente usando el cambio en los tiempos de espera acumulados como recompensa
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWT_QA_DiffCWT">
+  <img src="./images/MWT_QA_DiffCWT.png" alt="MWT_QA_DiffCWT" width="800" height="auto">
+  <p><i>Figura 28:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CR_QA_DiffCWT">
+  <img src="./images/CR_QA_DiffCWT.png" alt="CR_QA_DiffCWT" width="800" height="auto">
+  <p><i>Figura 29:</i> Recompensa acumulada del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EE_QA_DiffCWT">
+  <img src="./images/EE_QA_DiffCWT.png" alt="EE_QA_DiffCWT" width="800" height="auto">
+  <p><i>Figura 30:</i> Tiempo transcurrido del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+</div>
+
 ### Comparación con baseline
 
 ## Conclusiones
+
+### Dificultades y perspectiva futura
+
 
 ## Bibliografía
 <div id="ref1"></div>
