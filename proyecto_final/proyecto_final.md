@@ -3,16 +3,16 @@
 ## Introducción
 El volumen de tráfico vehicular en las ciudades cada vez ha sido mayor, lo cual ha producido numerosos problemas, el principal: las **congestiones**. Muchas redes de calles fueron planificadas teniendo en cuenta determinados flujos de tráfico, los cuales han sido superados a creces. Es posible replanificar parcialmente ciertas áreas de una ciudad, expandiendo calles y avenidas, cambiando el sentido de estas, agregando semáforos; sin embargo estas son soluciones estáticas.
 
-Las congestiones en ciudades tienen los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** ($CO$, $CO_2$, $NOx$, $HC$). En la [Figura 1](#avgTravelTimeToWork) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
+Las congestiones en ciudades generan los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** (CO, CO_2, NOx, HC). En la [Figura 1](#avgTravelTimeToWork) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="avgTravelTimeToWork">
   <img src="./images/avgTravelTimeWorkUS-2016_2019.png" alt="Average Travel Time to Work in the US: 2006 to 2019">
   <p><i>Figura 1:</i> Evolución anual del tiempo de viaje al trabajo promedio (en minutos), en los Estados Unidos.</p>
 </div>
 
-Adicionalmente, muchas ciudades utilizan semáforos con programaciones estáticas, lo cual resulta en una inflexibilidad notable en la gestión del tráfico. Esto puede provocar situaciones como la siguiente: en una intersección de dos calles, donde el flujo mayoritario proviene del este y del oeste, puede ocurrir que, de repente, aumente significativamente el número de vehículos provenientes del norte, superando a los demás. Dado que el semáforo tiene fases de tiempo fijo y prioriza la calle este/oeste, la gestión del tráfico se vuelve ineficiente e inflexible. Otra situación puede ser cuando solo hay vehículos ingresando a la intersección desde un carril, y los conductores se encuentren con un semáforo rojo, cuando no hay otros vehículos aproximandose a la intersección. Los semáforos con ciclos fijos, son incapaces de adaptarse dinámicamente a las situaciones de tráfico, lo cual impacta negativamente en los tiempos de espera de los vehículos.
+Adicionalmente, muchas ciudades utilizan semáforos con programaciones estáticas, lo cual resulta en una **inflexibilidad** notable en la gestión del tráfico. Esto puede provocar situaciones como la siguiente: en una intersección de dos calles, donde el flujo mayoritario proviene del este y del oeste, puede ocurrir que, de repente, aumente significativamente el número de vehículos provenientes del norte, superando a los demás. Dado que el semáforo tiene fases de tiempo fijo y prioriza la calle este/oeste, la gestión del tráfico se vuelve ineficiente e inflexible. Otra situación puede ser cuando solo hay vehículos ingresando a la intersección desde un carril, y los conductores se encuentren con un semáforo rojo, cuando no hay otros vehículos aproximandose a la intersección. Los semáforos con ciclos fijos, son incapaces de adaptarse dinámicamente a las situaciones de tráfico, lo cual impacta negativamente en los tiempos de espera de los vehículos.
 
-Una forma de abordar este problema es mediante el *framework* del *Reinforcement Learning* (aprendizaje por refuerzo). En este contexto, el controlador de semáforos actúa como un agente que interactúa con un entorno (escenario de tráfico) a través de cciones. Estas acciones son seleccionadas en función del *estado* actual del entorno (tráfico) y una recompensa proporcionada por este. La recompensa es un valor numérico que indica cuán efectiva fue la acción elegida.
+Una forma de abordar este problema es mediante el *framework* del *Reinforcement Learning* (aprendizaje por refuerzo). Dónde el controlador de semáforos actúa como un agente que interactúa con un entorno (escenario de tráfico) a través de acciones. Estas acciones son seleccionadas en función del *estado* actual del entorno (tráfico) y una recompensa proporcionada por este. La recompensa es un valor numérico que indica cuán efectiva fue la acción elegida.
 
 En este trabajo, se utilizó un simulador de tráfico para modelar el entorno (tráfico en intersección de avenidas). Posteriormente, se entrenó al controlador de semáforos empleando el algoritmo Q-Learning. El objetivo fué optimizar la gestión del tráfico en comparación con los semáforos de ciclo fijo, específicamente reducir el tiempo de espera promedio de todos los vehículos que ingresaron a la intersección.
 
@@ -133,7 +133,7 @@ El proceso de aprendizaje de una política que aprenda a gestionar tráfico din�
 
 #### SUMO
 
-**Simulation of Urban MObility** (SUMO) es una simulador de tráfico microscópico que ofrece un conjunto de herramientas útiles para diseñar situaciones de tráfico. Además ofrece una API en python llamada TraCI la cual nos ayudó a comunicar el entorno simulado con el agente. 
+**Simulation of Urban MObility** (SUMO) [[2]](#ref2) es una simulador de tráfico microscópico que ofrece un conjunto de herramientas útiles para diseñar situaciones de tráfico. Además ofrece una API en python llamada TraCI la cual nos ayudó a comunicar el entorno simulado con el agente. 
 
 **TraCI** usa una arquitectura TCP cliente/servidor que provee acceso a SUMO. SUMO actúa como servidor atendiendo peticiones en determinado puerto, y desde nuestro sistema (cliente), escrito en python, nos comunicamos via TraCI con este. Cabe destacar la posibilidad de atender multiples clientes, donde cada uno se sincroniza después de cada paso de simulación. Es decir, la simulación no avanza al siguiente paso hasta que todos los clientes hayan enviado el comando correspondiente al incrementar el paso de tiempo. 
 
@@ -335,13 +335,13 @@ $$
 En la [Figura 10](#logLinearBlend1) y en la [Figura 11](#logLinearBlend2), podemos ver el comportamiento de esta función para determinados valores de $I$ y $M$.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="logLinearBlend1">
-  <img src="./images/log_linear_blend_1.png" alt="logLinearBlend1 " height="500" width="auto">
+  <img src="./images/log_linear_blend_1.png" alt="logLinearBlend1 " height="auto" width="auto">
   <p><i>Figura 10:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=6. Se puede observar la curva logarítmica (curva sin aplicar <i>floor</i>, en color verde claro).</p>
 </div>
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="logLinearBlend2">
-  <img src="./images/log_linear_blend_2.png" alt="logLinearBlend2 " height="500" width="auto">
+  <img src="./images/log_linear_blend_2.png" alt="logLinearBlend2 " height="auto" width="auto">
   <p><i>Figura 11:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=24. Se puede observar el comportamiento lineal (sin aplicar <i>floor</i>, en color verde claro).</p>
 </div>
 
@@ -619,7 +619,7 @@ La cantidad de intervalos que se esperan mapear, para representar los distintos 
 Para el análisis de este hiper-parámetro, se fijaron los siguientes:
 
 - $lane\_info=waitingTime$
-- $reward\_fn=diff_waitingTime$
+- $reward\_fn=diff\ _waitingTime$
 - $episodes = 50$. (Cantidad de episodios).
 - $starting\_\epsilon=1$. ($\epsilon$ inicial)
 - $decay\_rate=0.025$. (Factor de caída exponencial).
@@ -663,7 +663,7 @@ Los valores de $learning\_rate$ propuestos son: 0.1, 0.01 y 0.001.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTparams_lr_100ep">
   <img src="./images/MWTparams_lr_100ep.png" alt="MWTparams_lr_100ep." width="1200" height="auto">
-  <p><i>Figura 24:</i> Evolución de los tiempos de espera promedio durante 100 episodios, para distintos <i>learning rates</i>.</p>
+  <p><i>Figura 24:</i> Evolución de los tiempos de espera promedio, para distintos <i>learning rates</i>.</p>
 </div>
 
 Observando la [Figura 24](#MWTparams_lr_100ep), vemos que con $learning\_rate = 0.1$ la convergencia es muy rápida y con $learning\_rate = 0.01$ ocurre lo contrario. De forma arbitraria, y con el fin de no extender demasiado el tiempo de entrenamiento, se eligió $learning\_rate = 0.01$.
@@ -693,21 +693,21 @@ Se realizaron 15 ejecuciones de entrenamiento del agente sobre el entorno desbal
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode">
   <img src="./images/MeanWaitingTimePerEpisode.png" alt="MWTPerEpisode" width="800" height="auto">
-  <p><i>Figura 25:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 25:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 La [Figura 25](MWTPerEpisode) muestra como, a partir del episodio 150, el tiempo de espera promedio, disminuye a lo que parece su límite inferior de la métrica. La figura demuestra que el agente Q-learning a logrado conocer una política de gestión de tráfico bastante superior a que la que utiliza en los primeros episodios (simulaciones).
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CRPerEpisode">
   <img src="./images/CRPerEpisode.png" alt="CRPerEpisode" width="800" height="auto">
-  <p><i>Figura 26:</i> Recompensa acumulada del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 26:</i> Recompensa acumulada del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 Como se mencionó previamente, en la [Figura 26](CRPerEpisode) se observa como la recompensa oscila bruscamente alrededor del 0. A medida que transcurren los episodios, la amplitud de esta oscilación disminuye, lo cual demuestra junto al gráfico anterior, que utilizando la función de recompensa de la **diferencia de la suma en los tiempos de espera**, la recompensa acumulada tiende a estabilizarse hacia el 0. Sin embargo, por la naturaleza de esta función de recompensa, esta métrica no nos resultó útil para evaluar el rendimiento de este sistema en particular.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EEPerEpisode">
   <img src="./images/EEPerEpisode.png" alt="EEPerEpisode" width="800" height="auto">
-  <p><i>Figura 27:</i> Tiempo transcurrido del agente Q-Learning, por episodio, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 27:</i> Tiempo transcurrido del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 
@@ -715,28 +715,87 @@ En la [Figura 27](EEPerEpisode) se observa una característica inherente del sim
 
 #### Escenario balanceado
 
+
+Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varían y son constantes desde los 4 puntos cardinales. Se realizaron 5 (-!!! de momento !!!-) ejecuciones de entrenamiento del agente sobre el entorno desbalanceado y se obtuvieron la **media** y **desviación estándar** para cada episodio, en cada una de las 3 métricas planteadas.
+
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode_b">
+  <img src="./images/MeanWaitingTimePerEpisode_B.png" alt="MWTPerEpisode_b" width="800" height="auto">
+  <p><i>Figura 28:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+</div>
+
+Observando la [Figura 28](#MWTPerEpisode_b), podemos observar que para este escenario en particular, la curva de disminución del tiempo de espera promedio es un poco diferente a la del escenario desbalanceado. La pendiente de la curva disminuye notablemente durante los primeros 50 episodios y luego durante los siguientes 75 episodios la pendiente se acerca a 0, para luego disminuir nuevamente hasta el episodio final (200). Como se puede ver en el [Diseño del Flujo de Tráfico](DiseniodelFlujoDeTrafico), el escenario desbalanceado tiene un flujo constante de vehículos durante cada episodio, pero es superior en cuanto a cantidad de vehículos generados, frente al escenario desbalanceado. Se puede ver que no alcanza la cota inferior, por lo que requiere de más episodios de entrenamiento.
+
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CRPerEpisode_B">
+  <img src="./images/CRPerEpisode_B.png" alt="CRPerEpisode_B" width="800" height="auto">
+  <p><i>Figura 29:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EEPerEpisode_B">
+  <img src="./images/EEPerEpisode_B.png" alt="EEPerEpisode_B" width="800" height="auto">
+  <p><i>Figura 30:</i> Tiempo transcurrido del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+</div>
+
+
+La [Figura 29](#MWTPerEpisode_b) revela un comportamiento similar al del escenario desbalanceado, pero con una amplitud de oscilación alta en los últimos episodios. Otra manera de visualizar el incremento en volumen de tráfico en este escenario es observando la [Figura 30](#EEPerEpisode_B). En los primeros episodios, el tiempo de ejecución de ejecución de un episodio es aproximadamente 80 segundos, frente a los 70 segundos del escenario desbalanceado. Esta carga adicional la maneja SUMO, y se refleja en los tiempos de ejecución.
 ### Agente usando el cambio en los tiempos de espera acumulados como recompensa
+
+Con el fin de observar el comportamiento del agente utilizando la función de recompensa alternativa, se realizó una ejecución de un entrenamiento de 200 episodios usando el cambio en los tiempos de espera acumulados. Esta ejecución se realizó únicamente en el escenario desbalanceado.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWT_QA_DiffCWT">
   <img src="./images/MWT_QA_DiffCWT.png" alt="MWT_QA_DiffCWT" width="800" height="auto">
-  <p><i>Figura 28:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+  <p><i>Figura 31:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
 </div>
+
+Utilizando los mismos hiper-parámetros (a excepción de la función de recompensa), se observa en la [Figura 31](#MWT_QA_DiffCWT) como el tiempo de espera promedio converge más rápidamente que con la otra función de recompensa. El tiempo de espera en los últimos episodios es ligeramente inferior en este agente, 1.508 segundos en el último episodio, siendo 1.797 segundos en el otro agente evaluado.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CR_QA_DiffCWT">
   <img src="./images/CR_QA_DiffCWT.png" alt="CR_QA_DiffCWT" width="800" height="auto">
-  <p><i>Figura 29:</i> Recompensa acumulada del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+  <p><i>Figura 32:</i> Recompensa acumulada del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, sobre un escenario desbalanceado.</p>
 </div>
+
+Haciendo uso de esta función de recompensa podemos observar más claramente como el agente incremente su recompensa acumulada a través de los episodios, como muestra la [Figura 33](#EE_QA_DiffCWT). Vemos como se comienza a acercar al 0 (máxima recompensa acumulada posible) y oscila cercano a este, a partir del episodio 50. Hasta estabilizar notablemente la recompensa acumulada en los episodios finales. Es posible ver como repercute esta métrica en la métrica del tiempo de espera promedio en la [Figura 31](#MWT_QA_DiffCWT). Las pendientes de ambas métricas crecen en magnitud de formas similares (pero con signo opuesto).
+
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EE_QA_DiffCWT">
   <img src="./images/EE_QA_DiffCWT.png" alt="EE_QA_DiffCWT" width="800" height="auto">
-  <p><i>Figura 30:</i> Tiempo transcurrido del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, por episodio, sobre un escenario desbalanceado.</p>
+  <p><i>Figura 33:</i> Tiempo transcurrido del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, sobre un escenario desbalanceado.</p>
 </div>
 
+
+De forma análoga al otro agente propuesto, ocurre algo similar con el tiempo transcurrido: disminuye cuando mejor se gestiona el tráfico. Sin embargo, los tiempos de espera en este agente son mucho mayor, lo cual relentiza el proceso de aprendizaje.
+
+
 ### Comparación con baseline
+Con el fin de comparar el rendimiento de nuestro agente frente a los semáforos tradicionales, ejecutamos 200 simulaciones del escenario desbalanceado utilizando este tipo de semáforo. Obtuvimos el tiempo de espera promedio en cada uno de estos episodios y lo comparamos con el de nuestro agente principal. A partir de la [Figura 33](QLAvsSTL), se distingue que de forma temprana (cerca de los primeros 15 episodios), nuestro agente supera el rendimiento (de acuerdo a la métrica) de este *baseline* propuesto. Al final del entrenamiento, el agente logra un tiempo de espera promedio muy inferior respecto al *baseline*, demostrando el buen rendimiento de este.
+
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="QLAvsSTL">
+  <img src="./images/QLAvsSTL.png" alt="EE_QA_DiffCWT" width="800" height="auto">
+  <p><i>Figura 33:</i> Tiempo de espera promedio del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, frente a semáforo con tiempos fijos, sobre un escenario desbalanceado.</p>
+</div>
 
 ## Conclusiones
 
+Con el objetivo de mejorar la gestión del tráfico mediante semáforos, se propuso una solución dinámica basada en *Reinforcement Learning*. Utilizando un simulador de tráfico, se abstrajeron los componentes esenciales de una situación de tráfico vehicular para modelar el entorno. Las simulaciones se realizaron sobre una intersección de dos avenidas, considerando dos escenarios posibles: uno desbalanceado y otro balanceado.
+
+El otro componente esencial del *Reinforcement Learning* es el agente, el cual debe aprender una política óptima para gestionar las fases de un semáforo en una intersección. Esta política se ejecuta basándose en los valores acción-estado (Q-values) estimados durante el entrenamiento, siguiendo el algoritmo **Q-learning**. Para evitar que el agente se quede atrapado en óptimos locales y busque mejores soluciones, se utilizó una estrategia epsilon-greedy durante el entrenamiento.
+
+De forma analítica, se determinaron los hiperparámetros más relevantes para ajustarlos y lograr un mejor rendimiento del sistema. Se exploraron valores para estos hiperparámetros que maximizaran las recompensas obtenidas sin requerir un gran tiempo de cómputo, debido a las limitaciones de hardware y la poca escalabilidad inherente al método tabular Q-learning. La función de recompensa utilizada por el sistema es parametrizable y resulta crucial que esté bien definida para lograr un aprendizaje efectivo. La mejor candidata fué la diferencia de tiempos de espera entre pasos de tiempo consecutivos. Posteriormente, se propuso una alternativa ligeramente superior, aunque más demandante en términos de cómputo: la diferencia entre tiempos de espera acumulados entre pasos de tiempo consecutivos.
+
+Finalmente, se entrenó al agente en los escenarios de tráfico planteados, utilizando las dos funciones de recompensa mencionadas. El agente Q-learning logró aprender una política que mejoró notablemente el rendimiento en todas las métricas planteadas. Tanto en el escenario balanceado como en el desbalanceado, y utilizando las dos funciones de recompensa, se logró una mejoría respecto al sistema de referencia, que consiste en un semáforo tradicional (de tiempos fijos) de dos fases. Los resultados muestran que se cumplieron las expectativas de la solución propuesta, reduciendo los tiempos de espera de los vehículos y, en consecuencia, las congestiones.
+
 ### Dificultades y perspectiva futura
+
+Uno de los principales defectos de nuestro sistema es la poca escalabilidad a escenarios de tráfico más grandes, debido a las características inherentes del método tabular Q-learning. La tabla requerida para almacenar los Q-values crece enormemente en un problema como este, con muchos estados y acciones posibles, y mientras más crece, más decae el rendimiento. Esta problemática puede ser solventada mediante el uso de redes neuronales, específicamente *Deep Q-Learning*.
+
+Otros dos factores que afectan el rendimiento del sistema están relacionados con SUMO y la interfaz *TraCI* que este ofrece. El primero es el uso de la biblioteca *TraCI* en vez de *libsumo*. Posteriormente, se descubrió que *libsumo* es mucho más eficiente que *TraCI* a la hora de ejecutar comandos sobre el simulador. El otro problema está vinculado a la información que almacena SUMO en su espacio de memoria (accesible desde la API), específicamente sobre sus carriles. No existe forma directa de extraer información sobre el tiempo de espera acumulado de los vehículos. La única forma es obtener el identificador de todos los vehículos involucrados en un instante de tiempo y solicitar el tiempo de espera acumulado de cada uno de los vehículos, uno por uno. Esto incrementa notablemente la cantidad de comunicaciones y, por lo tanto, requiere más tiempo computacional. Fue por esta razón que se eligió como función de recompensa principal la diferencia en los tiempos de espera.
+
+Además, sería interesante considerar el tiempo de espera acumulado de los vehículos en lugar del tiempo de espera actualmente utilizado. Este enfoque podría reflejar mejor la situación del tráfico. Y al incorporarlo a nuestra métrica de 'tiempo de espera promedio', los resultados serán más comprensibles en términos cotidianos (para el lenguaje común).
+
+Para mejorar el rendimiento y la escalabilidad de nuestro sistema, se invita a implementar las soluciones mencionadas anteriormente. Además, se recomienda paralelizar los entrenamientos, especialmente en la exploración de parámetros, para acelerar el proceso de aprendizaje y mejorar la eficiencia del sistema. Estas mejoras combinadas permitirán obtener un sistema más efectivo y escalable. Permitiendo adicionar redes de calles más grandes, más semáforos y mayor volumen de tráfico.
+
+
 
 
 ## Bibliografía
@@ -760,7 +819,7 @@ En la [Figura 27](EEPerEpisode) se observa una característica inherente del sim
 6. Bálint, K., Tamás, T. and Tamás, B. (2022) 'Deep Reinforcement Learning based approach for Traffic Signal Control,' Transportation Research Procedia, 62, pp. 278–285. https://doi.org/10.1016/j.trpro.2022.02.035.
 <div id="ref7"></div>
 
-7. SUMO-RL 1.4.5 documentation (no date). https://lucasalegre.github.io/sumo-rl/.
+7. Lucas N. Alegre - SUMO-RL 1.4.5 documentation. https://lucasalegre.github.io/sumo-rl/.
 <div id="ref8"></div>
 
 8. Hua Wei, Zhenhui Li, Vikash Gayah (2020) IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides) https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p
