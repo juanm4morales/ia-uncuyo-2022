@@ -3,7 +3,7 @@
 ## Introducción
 El volumen de tráfico vehicular en las ciudades cada vez ha sido mayor, lo cual ha producido numerosos problemas, el principal: las **congestiones**. Muchas redes de calles fueron planificadas teniendo en cuenta determinados flujos de tráfico, los cuales han sido superados a creces. Es posible replanificar parcialmente ciertas áreas de una ciudad, expandiendo calles y avenidas, cambiando el sentido de estas, agregando semáforos; sin embargo estas son soluciones estáticas.
 
-Las congestiones en ciudades generan los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** (CO, CO_2, NOx, HC). En la [Figura 1](#avgTravelTimeToWork) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
+Las congestiones en ciudades generan los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** (CO, CO2, NOx, HC). En la [Figura 1](#avgTravelTimeToWork) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="avgTravelTimeToWork">
   <img src="./images/avgTravelTimeWorkUS-2016_2019.png" alt="Average Travel Time to Work in the US: 2006 to 2019">
@@ -21,7 +21,7 @@ En este trabajo, se utilizó un simulador de tráfico para modelar el entorno (t
 
 
 ### Reinforcement Learning (RL)
-El **aprendizaje por refuerzo** (reinforcement learning, en inglés) consiste en mapear situaciones (estados) a acciones, con el objetivo de maximizar una señal de recompensa numérica. En el marco del aprendizaje por refuerzo, existen dos elementos esenciales: uno o más **agentes** y un **entorno**.
+El **aprendizaje por refuerzo** (*reinforcement learning*, en inglés) consiste en mapear situaciones (estados) a acciones, con el objetivo de maximizar una señal de recompensa numérica. En el marco del aprendizaje por refuerzo, existen dos elementos esenciales: un **agente** (o más) y un **entorno**.
 
 El **agente** es el tomador de decisiones, al cual no se le indica explícitamente qué acciones tomar, sino que debe descubrir cuáles acciones generan más recompensas a través de la exploración y la experimentación. Generalmente, las acciones pueden afectar no solo la recompensa inmediata, sino también el estado siguiente y, a través de este, todas las recompensas futuras.
 
@@ -43,10 +43,10 @@ En un MDP, el agente y el entorno interactúan en cada uno de una secuencia de p
 En los **MDPs finitos**, los conjuntos de estados, acciones y recompensas ($\mathcal{S}$, $\mathcal{A}$ y $\mathcal{R}$) contienen un número finito de elementos. Las variables aleatorias $R_t$ y $S_t$ siguen una distribución de probabilidad discreta $p$, la cual depende únicamente del estado y la acción precedentes. Esta dependencia exclusiva se conoce como la propiedad de Markov, y para las metodologías a utilizar se asume el cumplimiento de esta.
 
 $$
-p(s',r|s,a) = Pr\{ S_t=s', R_t=r | S_{t-1} = s, A_{t-1}=a \}
+p(s',r|s,a) = Pr\{ S_t=s', R_t=r | S_{t-1} = s, A_{t-1}=a \}.
 $$
 
-Existen métodos que intentan desarrollar un modelo para comprender el entorno. Estos métodos intentan aprender esta función de probabilidad $p$ para poder planificar, y se les dice *basados-en-modelo*. Por otro lado tenemos los algoritmos *libres-de-modelo* que buscan aprender las consecuencisa de las acciones a través de la experiencia. Esto lo hacen sin estimar la función $p$, y son el grupo de algoritmos de interés para este trabajo.
+Existen métodos que intentan desarrollar un modelo para comprender el entorno. Estos métodos intentan aprender esta función de probabilidad $p$ para poder planificar, y se les dice *basados-en-modelo*. Por otro lado tenemos los algoritmos *libres-de-modelo* que buscan aprender las consecuencias de las acciones a través de la experiencia. Esto lo hacen sin estimar la función $p$, y son el grupo de algoritmos de interés para este trabajo.
 
 ### Retorno
 
@@ -58,7 +58,7 @@ dónde $T$ es el paso de tiempo final.
 
 En muchos casos se debe destacar la fortaleza que tiene las recompensas más lejanas (en el tiempo) frente a las recompensas inmediatas, para esto usamos un *factor de descuento* $\gamma$. El factor de descuento $\gamma$ es un parámetro, $0 \leq \gamma \leq 1$ y lo usamos para obtener el **retorno descontado**:
 
-$$ G_t = R_{t+1} + \gamma R_{t+2} + \gamma ^{2} R_{t+3} + ... + = \sum_{t=0}^{T} R_{t+1} $$
+$$ G_t = R_{t+1} + \gamma R_{t+2} + \gamma ^{2} R_{t+3} + ... + = \sum_{t=0}^{T} R_{t+1}. $$
 
 
 ### Función de acción-valor y política
@@ -78,14 +78,15 @@ Una propiedad fundamental de $Q_*$ es que debe satisfacer la siguiente ecuación
 
 $$Q_* (s,a) = E \left[ R_{t+1} + \gamma \max_{a'} Q_*(S_{t+1},a') \mid S_t = s, A_t = a \right].$$
 
-Esta se llama **ecuación de optimalidad de Bellman** y es la base del algoritmo Q-learning. Utilizando esta ecuación como base y utilizando programación dinámica, obtenemos el siguiente método para aproximar $Q_*$:
+Esta se llama **ecuación de optimalidad de Bellman** y es la base del algoritmo **Q-learning**. Utilizando esta ecuación como base y utilizando programación dinámica, obtenemos el siguiente método para aproximar $Q_*$:
 
 $$ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_{a} Q_*(S_{t+1},a) - Q(S_t, A_t) \right].$$
 
 Donde $\alpha$ es la *tasa de aprendizaje*, un parámetro que controla la rapidez con la que los valores de $Q$ convergen hacia los óptimos. Este proceso se repite hasta que los valores de $Q$ converjan o hasta que se alcance un cierto número de iteraciones.
 
-### Terminología: tráfico
+### Terminología utilizada
 
+A continuación se daran las definiciones de terminología importante a la hora de explicar la solución propuesta y discutir los resultados.
 
 **Carril** (*lane*): Una intersección está compuesta por una conjunto de carriles. Hay dos tipos de carriles: carriles entrantes y carriles salientes.
 
@@ -129,7 +130,7 @@ Nuestro objetivo principal es maximizar la recompensa definida, lo cual producir
 
 ### Entorno
 
-El proceso de aprendizaje de una política que aprenda a gestionar tráfico dinámicamente, se llevó a cabo sobre una intersección de 2 calles, doble mano y con 2 carriles cada mano. La intersección y el flujo de tráfico sobre esta, se modeló con herramientas de simulación provistas por el paquete SUMO. De esta forma se abstrajo el entorno con el cual interactua el agente Q-learning.
+El proceso de aprendizaje de una política que gestione el tráfico dinámicamente, se llevó a cabo sobre una intersección de dos calles, doble mano y con dos carriles cada mano. La intersección y el flujo de tráfico sobre esta, se modeló con herramientas de simulación provistas por el paquete SUMO. De esta forma se abstrajo el entorno con el cual interactua el agente Q-learning.
 
 #### SUMO
 
@@ -142,52 +143,52 @@ En nuestro caso usamos un solo cliente para conectarnos a SUMO, y tanto servidor
 TraCI permite obtener y modificar información del tráfico simulado de muchas maneras. Para recuperar información del estado tráfico en la intersección usamos los siguientes comandos:
 
 - Información de carriles.
-  - lane.getIDList(). Retorna una lista de ids de todos los carriles del escenario.
-  - lane.getWaitingTime(laneID). Retorna el tiempo (en s) de espera de todos los vehículos en el carril $laneID$.
-  - lane.getLastStepHaltingHumber(laneID). Retorna el numero total de vehículos detenidos en el último paso de tiempo en el carril dado. Una velocidad inferior a 0.1 m/s es considerada una detención.
+  - $lane.getIDList()$. Retorna una lista de ids de todos los carriles del escenario.
+  - $lane.getWaitingTime(laneID)$. Retorna el tiempo (en s) de espera de todos los vehículos en el carril $laneID$.
+  - $lane.getLastStepHaltingHumber(laneID)$. Retorna el numero total de vehículos detenidos en el último paso de tiempo en el carril dado. Una velocidad inferior a 0.1 m/s es considerada una detención.
 
 - Información de vehículos.
-  - vehicle.getAccumulatedWaitingTime(vehicleID). Devuelve el tiempo de espera acumulado (en segundos) dentro del intervalo de tiempo anterior de longitud, por defecto son 100 s. (la longitud es configurable por la opción --waiting-time-memory dada a la aplicación principal). En el experimento Se utilizó el valor del intervalor por defecto.
+  - $vehicle.getAccumulatedWaitingTime(vehicleID)$. Devuelve el tiempo de espera acumulado (en segundos) dentro del intervalo de tiempo anterior de longitud, por defecto son 100 s. (la longitud es configurable por la opción --waiting-time-memory dada a la aplicación principal). En el experimento Se utilizó el valor del intervalor por defecto.
 
 - Información de semáforos.
-  - trafficlight.getIDList(). Retorna una lista de ids de todos los semáforos invoucrados.
-  - trafficlight.getControlledLanes(trafficlightID). Retorna una lista de ids de todos los carriles que controla el semáforo especificado.
+  - $trafficlight.getIDList()$. Retorna una lista de ids de todos los semáforos invoucrados.
+  - $trafficlight.getControlledLanes(trafficlightID)$. Retorna una lista de ids de todos los carriles que controla el semáforo especificado.
 
 - Información general de la simulación.
-  - simulation.getMinExpectedNumber(). Retorna el número de vehículos que hay circulando en la red, más el número de vehículos que esperan a su aparición en la simulación. 
-  - simulation.getTime(). Retorna el tiempo de simulación actual (en s)
+  - $simulation.getMinExpectedNumber()$. Retorna el número de vehículos que hay circulando en la red, más el número de vehículos que esperan a su aparición en la simulación. 
+  - $simulation.getTime()$. Retorna el tiempo de simulación actual (en segundos)
 
 Para cambiar el estado del tráfico usamos:
 
 - Cambio del estado de semáforos.
-  - trafficlight.setRedYellowGreenState(trafficlightID, state). Cambia la fase del semáforo a la otorgada. El cambio se llevará a cabo en el próximo paso de simulación.
-  - trafficligth.setProgram(trafficlightID, programID). Cambia el programa del semáforo por el especificado.
+  - $trafficlight.setRedYellowGreenState(trafficlightID, state)$. Cambia la fase del semáforo a la otorgada. El cambio se llevará a cabo en el próximo paso de simulación.
+  - $trafficlight.setProgram(trafficlightID, programID)$. Cambia el programa del semáforo por el especificado.
 
 #### Diseño del escenario
 
 Un archivo de red para SUMO describe la parte de un mapa relacionada con el tráfico, las calles e intersecciones por las que circulan los vehículos simulados. Esta red se representa mediante un gráfico dirigido, dónde los nodos representan intersecciones o fines de carreteras, y las aristas calles. Una red SUMO contiene la siguiente información:
 
 - Cada calle (arista) como una colección de carriles, incluyendo la posición, forma y límite de velocidad de cada carril.
-- Semáforos con sus lógicas, referenciadas por intersecciones.
-- Los cruces, incluida la regulación del derecho de paso.
-- Las conexiones entre carriles en los cruces (nodos)
+- Semáforos con sus programas, referenciadas por intersecciones.
+- Los cruces, incluyendo la regulación del derecho de paso.
+- Las conexiones entre carriles en los cruces (nodos).
 
-El archivo de red SUMO siguie el formato XML, dónde se pueden crear manualmente, con herramientas de conversión de mapas (*netconvert*) o usando la herramienta netedit. Netedit es un editor de redes de tráfico con una interfaz gráfica para el usuario. Es una herramienta incluida en el paquede SUMO, la cual se usó principalmente para diseñar la intersección.
+El archivo de red SUMO sigue el formato XML, dónde se pueden crear manualmente, con herramientas de conversión de mapas (*netconvert*) o usando la herramienta netedit. **Netedit** es un editor de redes de tráfico con una interfaz gráfica para el usuario. Es una herramienta incluida en el paquede SUMO, la cual se usó principalmente para diseñar la intersección.
 
-El escenario consta de 2 calles doble mano (sentido) de 189.6 metros, con 2 carriles (izquierdo y derecho) cada mano, perpendiculares entre ellas, estableciendo una intersección dónde se posiciona nuestro controlador de semáforos. En cada carril izquierdo, que ingresan a la intersección, circularán los vehículos cuyas intención es seguir recto o doblar a la izquierda. Mientrás que en los carriles de lado derecho, los vehículos que pasan por estos, seguirán recto o doblarán a la derecha. En la [Figura 5](#trafficSignals) se puede observar la intersección creada mediante netedit.
+Como se dijo previamente, el escenario consta de dos calles doble mano (sentido) de 189.6 metros, con dos carriles (izquierdo y derecho) cada mano, perpendiculares entre ellas, estableciendo una intersección dónde se posiciona nuestro controlador de semáforos. En cada carril izquierdo, que ingresan a la intersección, circularán los vehículos cuyas intención es seguir recto o doblar a la izquierda. Mientrás que en los carriles de lado derecho, los vehículos que pasan por estos, seguirán recto o doblarán a la derecha. En la [Figura 5](#trafficSignals) se puede observar la intersección creada mediante netedit.
 
-Una característica adicional de las calles de nuestra intersección es que representan avenidas, por lo cual la velocidad máxima permitida en estas avenidas es la establecida por la ley de tránsito de la república Argentina, la cual es 60 km/h (aproximadamente 16.67 m/s).
+Una característica adicional de las calles de nuestra intersección es que representan avenidas, dónde la velocidad máxima permitida en estas avenidas es la establecida por la ley de tránsito de la república Argentina, la cual es 60 km/h (aproximadamente 16.67 m/s).
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="trafficSignals">
   <img src="./images/netedit_intersection.png" alt="Traffic Signals in SUMO.">
-  <p><i>Figura 5:</i> Intersección creada en netedit, utilizada para simular el entorno.</p>
+  <p><i>Figura 5:</i> Intersección creada en <i>netedit</i>, utilizada para simular el entorno.</p>
 </div>
 
 <div id="DiseniodelFlujoDeTrafico">
 
 #### Diseño del flujo de tráfico
 
-Con el fin de aportar un poco de diversidad a nuestros escenarios de tráfico creamos 3 tipos de vehículos, distinguidos principalmente por su rapidez máxima al circular en la red. Además cada tipo de vehículo tendrá una proporción determinada respecto a la cantidad de vehículos que se generarán. Los tipos de vehículos son:
+Con el fin de aportar un poco de diversidad a nuestros escenarios de tráfico creamos tres tipos de vehículos, distinguidos principalmente por su rapidez máxima al circular en la red. Además cada tipo de vehículo tendrá una proporción determinada respecto a la cantidad de vehículos que se generarán. Los tipos de vehículos son:
 
 - **Vehículo rápido** (color rojo). Velocidad máxima = 22.22 m/s (limitada por la velocidad máxima permitida en las calles de la intersección, 16.67 m/s). Proporción = 0.15.
 
@@ -195,7 +196,7 @@ Con el fin de aportar un poco de diversidad a nuestros escenarios de tráfico cr
 
 - **Vehículo lento** (color celeste). Velocidad máxima = 14 m/s. Proporción = 0.25.
 
-Desde los 4 nodos que no intersectan (exteriores) se generarán vehículos siguiendo una distribución de Poisson. Sea $X$ la variable aleatoria, dónde $X$ = "cantidad de vehículos que se generan por segundo", $X$ sigue una distribución de Poisson dónde se espera que ingresen $\lambda$ (parámetro de la distribución) vehículos por segundo. Esta generación de vehículos se llevará a cabo durante 12 horas de tiempo simulado, y esta cantidad de horas establece la cantidad de pasos de tiempo que transcurren en 1 episodio. Se crearon dos escenarios sintéticos, uno balanceado y el otro desbalanceado.
+Desde los 4 nodos que no intersectan (exteriores), se generarán vehículos siguiendo una distribución de *Poisson*. Sea $X$ la variable aleatoria, dónde $X$ = "cantidad de vehículos que se generan por segundo", $X$ sigue una distribución de Poisson dónde se espera que ingresen $\lambda$ (parámetro de la distribución) vehículos por segundo. Esta generación de vehículos se llevará a cabo durante 12 horas de tiempo simulado, y esta cantidad de horas establece la cantidad de pasos de tiempo que transcurren en un episodio. Se crearon dos escenarios sintéticos, uno balanceado y el otro desbalanceado.
 
 
 - **Escenario balanceado**. La característica principal de los flujos de tráfico en este escenario es que son constantes de inicio a fin, e iguales desde todos los nodos de origen, como se puede observar en la [Figura 6](#balancedScenario). Los parámetros de los flujos vehiculares, modelados mediante una distribución de Poisson, se presentan en la [Tabla 1](#balancedScenarioTable). Estos parámetros modelan los flujos de vehículos provenientes de distintas direcciones.
@@ -206,7 +207,7 @@ Desde los 4 nodos que no intersectan (exteriores) se generarán vehículos sigui
 </div>
 
 
-<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="balancedScenarioTable">
+<div style="display: flex; flex-direction: column;" id="balancedScenarioTable">
   <br>
   <p><i>Tabla 1:</i> Parámetros de la distribución que modela el flujo de tráfico en un escenario balanceado.</p>
 </div>
@@ -224,7 +225,7 @@ Desde los 4 nodos que no intersectan (exteriores) se generarán vehículos sigui
 </div>
 
 
-<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="unbalancedScenarioTable">
+<div style="display: flex; flex-direction: column;" id="unbalancedScenarioTable">
   <br>
   <p><i>Tabla 2:</i> Parámetros de la distribución que modela el flujo de tráfico en un escenario desbalanceado.</p>
 </div>
@@ -237,7 +238,7 @@ Desde los 4 nodos que no intersectan (exteriores) se generarán vehículos sigui
 | 8-12 Hs | 0.1695 | 0.1808 | 0.2208 | 0.2477 |
 
 
-Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, está constituido por 3 flujos con rutas distintas. Cuando se genera un vehículo desde un punto de origen, este aleatoriamente elige una de estas rutas.
+Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, está constituido por tres flujos con rutas distintas. Cuando se genera un vehículo desde un punto de origen, este aleatoriamente elige una de estas rutas.
 
 - Ruta de vehículos que girarán a la **izquierda***. Con una probabilidad de 0.08.
 - Ruta de vehículos que seguirán **recto**. Con una probabilidad de 0.7.
@@ -252,27 +253,27 @@ Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, es
 
 
 
-Más [adelante](#ObservacionSobreLaRecompensaAcumulada) se explica un fenómeno que ocurre al calcular las recompensa acumuladas sobre estos escenarios.Cuando se ejecutan desde el inicio hasta el final, cuando no queden vehículos circulando en la intersección, ocurre que las recompensas acumuladas en el episodio se anulan (igual a 0). Para atenuar este comportamiento se procede a ejecutar 10 minutos de "calentamiento" (una simulación no observada) antes de comenzar con la simulación a observar. Y cuando se llega a un tiempo determinado (12 horas y 10 minutos en todos los escenarios), se finaliza el episodio abruptamente. 
+Más [adelante](#ObservacionSobreLaRecompensaAcumulada) se explica un fenómeno que ocurre al calcular las recompensa acumuladas sobre estos escenarios. Cuando se ejecutan desde el inicio hasta el final, cuando no queden vehículos circulando en la intersección, ocurre que las recompensas acumuladas en el episodio se anulan (igual a 0). Para atenuar este comportamiento se procede a ejecutar 10 minutos de "calentamiento" (una simulación no observada) antes de comenzar con la simulación a observar. Y cuando se llega a un tiempo determinado (12 horas y 10 minutos en todos los escenarios), se finaliza el episodio abruptamente. 
 
 
 ### Agente
 
-Nuestro agente de reinforcement learning  se enfrenta a un proceso de optimización de tiempos de espera de los vehículos, en un entorno dinámico, específicamente una intersección con tráfico. Este proceso lo abstraemos a un Proceso de Decisión de Markov (MDP), donde queremos estimar los Q-values (función acción-valor) de una política óptima de gestión de tráfico. Para lograr esto, usamos el algoritmo Q-learning.
+Nuestro agente de se enfrenta a un proceso de optimización de tiempos de espera de los vehículos, en un entorno dinámico, específicamente una intersección con tráfico. Este proceso lo llevamos a cabo estimando los Q-values (función acción-valor) asociados a una política óptima de gestión de tráfico. Para lograr esto, usamos el algoritmo Q-learning.
 
-Este agente Q-learning podrá observar parcialmente el entorno simulado (estados), y, siguiendo una política epsilon greedy,  elegirá cual es la próxima fase (acciones) del semáforo involucrado en la intersección. Adicionando la información de la recompensa obtenida al elegir determinada fase y el nuevo estado obtenido, se actualizarán los valores de la Q-table. Como se ilustra en la [Figura 9](), este es el proceso de aprendizaje que se llevará a cabo durante toda la simulación de un episodio.
+Este agente Q-learning podrá observar parcialmente el entorno simulado (estados), y, siguiendo una política *$\epsilon$-greedy*,  elegirá cual es la próxima fase (acción) del semáforo involucrado en la intersección. Adicionando la información de la recompensa obtenida al elegir determinada fase y el nuevo estado obtenido, se actualizarán los valores de la Q-table. En la [Figura 9](#AgentEnvInterface) se observa este proceso, incluyendo la comunicación con SUMO a través de la API TraCI.
 
-<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="unbalancedScenario">
-  <img src="./images/AgentEnv.png" alt="Route Probabilites.">
-  <p><i>Figura 9:</i> Arquitectura del sistema de Reinforcement Learning.</p>
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="AgentEnvInterface">
+  <img src="./images/AgentEnv.png" alt="Agent-Enviroment Interface">
+  <p><i>Figura 9:</i> Arquitectura del sistema de <i>Reinforcement Learning</i>.</p>
 </div>
 
 Q-learning es un **enfoque sin modelo**, lo cual resulta útil en nuestros escenarios de tráfico, dónde la dinámica es desconocida y difícil de modelar para nuestro agente. Este algoritmo es simple, tarde o temprano converge y adicionalmente, ya ha sido utilizado en problemas similares. 
 
-El mayor desafío de este método recae en la poca escalabilidad, ya que el rendimiento empeora a medida que crece la Q-table. Para lograr un aprendizaje eficiente se tuvieron que ajustar varios parámetros como la tase de aprendizaje, la cantidad de intervalos posibles en los estado o la información utilizada a la hora de representar un estado.
+El mayor desafío de este método recae en la poca escalabilidad, ya que el rendimiento empeora a medida que crece la Q-table. Para lograr un aprendizaje eficiente se tuvieron que ajustar varios parámetros como la tase de aprendizaje $\gamma$, la cantidad de intervalos posibles en los estado, la información utilizada a la hora de representar un estado y otros más.
 
 ### Acciones
 
-El agente controlador de semáforos necesita selecciona una acción apropiada ante el estado de tráfico actual en la intersección. El conjunto de acciones disponibles para el agente está compuesto por todas las fases posibles que puede tomar un semáforo. Estas fases son las siguientes:
+El agente controlador de semáforos necesita seleccionar una acción apropiada ante determinado estado de tráfico en la intersección. El conjunto de acciones disponibles para el agente está compuesto por todas las fases posibles que puede tomar un semáforo. Estas fases son las siguientes:
 
 
 1) **ew_we**: $rrrrGGGrrrrrGGGr$. Movimiento este-oeste y oeste-este, sin permiso de giro a la izquierda.
@@ -312,7 +313,7 @@ Cada caracter de una fase describe una señal de movimiento del semáforo. En la
 
 
 ### Estados
-Un estado $s \in \mathcal{S}$ se compone de 2 componentes principales:
+Un estado $s \in \mathcal{S}$ se compone de dos componentes principales:
 
 - **Fase actual del semáforo**. 
 - **Cantidad de vehículos detenidos** por carril o **suma de tiempos de espera** de todos los vehículos por carril. Estos valores son extraídos a partir de información de todos los vehículos involucrados en el último paso de tiempo.
@@ -324,7 +325,7 @@ Si en cada carril hay una gran cantidad de vehículos el tamaño de la Q-table p
 
 Para discretizar el espacio de estados a un número finito se utilizó una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario ($I$ cercano a $M$), el comportamiento se aproximará al lineal (intervalos regulares).
 
-Justificación:  Cuando tenenemos 0, 1, 2, 3 o 4 vehículos puede tener sentido diferenciar cada uno de estos valores, pero cuando hay 22, 23 o 24 vehículos, no existe gran diferencia en el contexto del estado de tráfico.
+Justificación:  Cuando tenenemos 0, 1, 2, 3 o 4 vehículos puede tener sentido diferenciar cada uno de estos valores, utilizando una función que codifique intervalos regulares. Pero cuando hay 22, 23 o 24 vehículos, no existe gran diferencia entre estos valores, en el contexto del estado de tráfico.
 
 Sea $L=\frac{I-1}{M}$,
     
@@ -336,24 +337,24 @@ En la [Figura 10](#logLinearBlend1) y en la [Figura 11](#logLinearBlend2), podem
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="logLinearBlend1">
   <img src="./images/log_linear_blend_1.png" alt="logLinearBlend1 " height="auto" width="auto">
-  <p><i>Figura 10:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=6. Se puede observar la curva logarítmica (curva sin aplicar <i>floor</i>, en color verde claro).</p>
+  <p><i>Figura 10:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=6 (en color verde oscuro). Se puede observar la curva logarítmica (curva sin aplicar <i>floor</i>, en color verde claro).</p>
 </div>
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="logLinearBlend2">
   <img src="./images/log_linear_blend_2.png" alt="logLinearBlend2 " height="auto" width="auto">
-  <p><i>Figura 11:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=24. Se puede observar el comportamiento lineal (sin aplicar <i>floor</i>, en color verde claro).</p>
+  <p><i>Figura 11:</i> Función propuesta para la codificación del espacio de estados, con M=24 e I=24 (en color verde oscuro). Se puede observar el comportamiento lineal (sin aplicar <i>floor</i>, en color verde claro).</p>
 </div>
 
 Para nuestros experimentos fijamos, de forma semi-arbitraria, el parámetro $M$. En el caso de usar la cantidad de vehículos detenidos por carril, para la representación del estado, elegimos $M=30$. Pues, en cada carril entran aproximadamente 30 vehículos, aunque también se cuentan los que estan en cola de espera fuera de la red. Si usamos el tiempo de espera por carril para representar estados, entonces $M=500$. Por otro lado, $M=500$ fué elegido pensando en que este valor es "suficientemente alto" para la suma de tiempos de espera de un carril. Estas selecciones se hicieron observando visualmente la dinámica de tráfico en un escenario desbalanceado. Téngase en cuenta que $I$ no representa la cantidad máxima de valores que pueden ser mapeados por la función, de manera similar a lo que sucede con $M$.
 
 
 
-### Recompensas
+### Funciones de recompensa
 
 La elección de una función de recompensa es crucial para el proceso de aprendizaje del agente. El objetivo principal es proveer un *feedback* del rendimiento adquirido gracias a las acciones previas. 
 
-En principio, en nuestro sistema probamos 2 funciones de recompensa: cambio en los tiempos de espera y cambio en la cantidad de vehículos detenidos. Luego, por razones que se explicarán en la discusión de resultados, se adicionó una tercera función de recompensa: cambio en los tiempos de espera acumulados.
+En principio, en nuestro sistema probamos dos funciones de recompensa: cambio en los tiempos de espera y cambio en la cantidad de vehículos detenidos. Luego, por razones que se explicarán más adelante, se adicionó una tercera función de recompensa: cambio en los tiempos de espera acumulados.
 
 #### Recompensa: Cambio en los tiempos de espera
 Una métrica muy utilizada para la eficiencia en el control de semáforos, es el tiempo de espera de los vehículos. Por eso, una de las recompensas propuestas fué el **cambio en los tiempos de espera** entre el paso de tiempo actual y el anterior.
@@ -428,6 +429,7 @@ $$AW_e =\frac{1}{V_e}  \sum_{v=1}^{V_e} w_{v}^e.$$
 
 Dónde:
 - $e$ es el episodio evaluado.
+- $v$ representa a un vehículo.
 - $V_e$ es el número total de vehículos que circularon durante el episodio.
 - $w_{v}^e$ es el tiempo de espera del vehículo $v$, generado en el episodio $e$ (usando la definición de tiempo de espera de SUMO).
 
@@ -440,16 +442,24 @@ Dónde:
 - $e$ es el episodio evaluado.
 - $t$ representa el paso de tiempo.
 - $T$ la cantidad de pasos de tiempo que tiene un episodio.
-- $R_t$ es la recompensa, en el instante $t$ del episodio $e$.
+- $R_e^t$ es la recompensa, en el instante $t$ del episodio $e$.
 
+#### Tiempo de ejecución
+
+$${ET}_e = tf_e - ts_e$$
+
+Dónde:
+- $e$ es el episodio evaluado.
+- $ts_e$ representa el instante de tiempo previo a la ejecución del episodio $e$.
+- $tf_e$ representa el instante de tiempo posterior a la ejecución del episodio $e$.
 
 
 ### Baseline
 
-Para evaluar el desempeño del agente Q-learning en la gestión de semáforos, hemos establecido una línea base (*baseline*) que servirá como punto comparativo para los resultados obtenidos. La línea de base consiste en un sistema de control con tiempos fijos, una configuración comúnmente utilizada en muchas intersecciones urbanas. Las secuencia de fases de dicha configuración se encuentran en la [Tabla 5](#fixed_tl) 
+Para evaluar el desempeño del agente Q-learning en la gestión de semáforos, hemos establecido una línea base (*baseline*) que servirá como punto comparativo para los resultados obtenidos. La línea de base consiste en un sistema de control con tiempos fijos, una configuración comúnmente utilizada en muchas intersecciones urbanas. La secuencia de fases de dicha configuración se encuentran en la [Tabla 5](#fixed_tl).
 
 
-<div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="fixed_tl">
+<div style="display: flex; flex-direction: column;" id="fixed_tl">
   <br>
   <p><i>Tabla 5:</i> Secuencia de fases del controlador de semáforos con tiempos fijos.</p>
 </div>
@@ -477,7 +487,7 @@ El éxito del agente propuesto depende en gran medida de la configuración adecu
 - **Factor de aprendizaje** (*learning rate*, $\alpha$)
 
 
-De los hiper-parámetros nombrados: delta time, el tiempo de duración de la fase amarilla y el factor de descuento, fueron elegidos de forma análitica. A partir de estas selecciones, se fijaron para todo el proceso de experimentación.
+De los hiper-parámetros nombrados: *delta time*, el tiempo de duración de la fase amarilla y el factor de descuento, fueron elegidos de forma análitica. A partir de estas selecciones, se fijaron para todo el proceso de experimentación.
 
 #### Duración de la fase amarilla
 La **duración de la fase amarilla** se ha fijado en **4 segundos** tras observaciones experimentales en simulaciones. Un tiempo inferior causaba muchas situaciones de "frenado de emergencia" para evitar colisiones, alterando el comportamiento natural de conducción de los vehículos. Con 4 segundos, los conductores pueden reaccionar de manera segura y gradual al cruzar la intersección, reduciendo la fluidez del tráfico. Esta selección minimizó los "frenados de emergencia".
@@ -514,7 +524,7 @@ Los posibles valores del hiper-parámetro a evaluar son:
 
 - $lane\_info = waitingTime$. Sumatoria de los **tiempos de espera** de vehículos, por carril.
 
-- $lane\_info = halted$. Cantidad de **vehículos detenidos**, por carril
+- $lane\_info = halted$. Cantidad de **vehículos detenidos**, por carril.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTparamsLaneInfo_100ep">
   <img src="./images/MWTparamsLaneInfo_100ep.png" alt="MWTparamsLaneInfo_100ep." height="auto" width="800">
@@ -526,7 +536,7 @@ Los posibles valores del hiper-parámetro a evaluar son:
   <p><i>Figura 14:</i> Tiempo de ejecución transcurrido por episodio, y para distintos valores del parámetro <i>lane_info</i>.</p>
 </div>
 
-Con los resultado obtenidos de la [Figura 13](#MWTparamsLaneInfo_100ep), se puede observar una convergencia más veloz al utilizar como información los tiempos de espera. Sin embargo, esto no indica una clara superioridad durante el momento de aprendizaje, ya que existe la posibilidad de que los parámetros fijados no "sintonizen" (no sean los más apropiados, en otras palabras) con el valor "halted". Ya que nuestra métrica principal es el tiempo de espera promedio, y como se puede ver en la [Figura 14](#EEparamsLaneInfo_100ep) el tiempo de cómputo decrece más rápido con $lane\_info=waitingTime$, escogimos este valor para entrenar al agente Q-Learning.
+Con los resultado obtenidos de la [Figura 13](#MWTparamsLaneInfo_100ep), se puede observar una convergencia más veloz al utilizar como información los tiempos de espera. Sin embargo, esto no indica una clara superioridad durante el momento de aprendizaje, ya que existe la posibilidad de que los parámetros fijados no "sintonizen" (no sean los más apropiados, en otras palabras) con el valor "*halted*". Ya que nuestra métrica principal es el tiempo de espera promedio, y como se puede ver en la [Figura 14](#EEparamsLaneInfo_100ep) el tiempo de cómputo decrece más rápido con $lane\_info=waitingTime$, escogimos este valor para entrenar al agente Q-Learning.
 
 #### Función de Recompensa
 
@@ -535,10 +545,10 @@ A continuación se presentan los resultados obtenidos al comparar distintas func
 Se fijaron los valores de los siguientes parámetros:
 
 - $lane\_info=waitingTime$
-- $episodes = 50$. (Cantidad de episodios).
-- $discrete\_intervals=4$. (Intervalos a codificar).
-- $starting\_\epsilon=1$. ($\epsilon$ inicial)
-- $decay\_rate=0.05$. (Factor de caída exponencial).
+- $episodes = 50$.
+- $discrete\_intervals=4$.
+- $starting\_\epsilon=1$.
+- $decay\_rate=0.05$.
 
 Los funciones de recompensa propuestas son:
 
@@ -553,7 +563,7 @@ Los funciones de recompensa propuestas son:
   <p><i>Figura 15:</i> Recompensa acumulada a través de los episodios, para las distintas funciones de recompensa.</p>
 </div>
 
-Como se mencionó en la sección [Observación sobre la recompensa acumulada](#ObservacionSobreLaRecompensaAcumulada), usando la función de recompensa $diff\_waitingTime$ se puede observar  una situación aproximada en la [Figura 15](#CRparamsRewardFn_50ep), dónde la recompensa acumulada oscila alrededor de 0. Esta oscilación se produce debido a la implementación de la metodología descrita en la sección [Diseño del flujo de tráfico](#DiseniodelFlujoDeTrafico), usada para atenuar el comportamiento de anulación de la recompensa acumulada. Por esta razón se propuso una tercera función de recompensa, la diferencia en los tiempos de espera acumulados de los vehículos (*diff_cumulativeWaitingTime*). De esta forma es posible interpretar mejor el aprendizaje a través de los episodios mediante la función de recompensa acumulada. La recompensa acumulada para esta función de recompensa crece hasta acercarse al 0 desde los negativos.
+Como se mencionó en la sección [Observación sobre la recompensa acumulada](#ObservacionSobreLaRecompensaAcumulada), usando la función de recompensa $diff\_waitingTime$ se puede observar  una situación aproximada en la [Figura 15](#CRparamsRewardFn_50ep), dónde la recompensa acumulada oscila alrededor de 0. Esta oscilación se produce debido a la implementación de la metodología descrita en la sección [Diseño del flujo de tráfico](#DiseniodelFlujoDeTrafico), usada para atenuar el comportamiento de anulación de la recompensa acumulada. Por esta razón se propuso una tercera función de recompensa, la diferencia en los tiempos de espera acumulados de los vehículos ($diff\_cumulativeWaitingTime$). De esta forma es posible interpretar mejor el aprendizaje a través de los episodios mediante la función de recompensa acumulada. La recompensa acumulada para esta función de recompensa crece hasta acercarse al 0 desde los negativos.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTparamsRewardFn_50ep">
@@ -561,7 +571,7 @@ Como se mencionó en la sección [Observación sobre la recompensa acumulada](#O
   <p><i>Figura 16</i>: Evolución de los tiempos de espera promedio (en segundos), para las distintas funciones de recompensa.</p>
 </div>
 
-Las 3 funciones de recompensa tienen una curva de disminución similar respecto al tiempo de espera promedio, como muestra la [Figura 16](#MWTparamsRewardFn_50ep). En la "ventana" de los 50 episodios y en esta ejecución en particular, *diff_cumulativeWaitingTime* y *diff_waitingTime* se aproximan a un óptimo (mínimo) ligeramente mejor que al usar *diff_Halted*. Para la elección de la/s función/es de recompensa más apropiadas, también se tuvo en cuenta el tiempo de ejecución de cada episodio.
+Las 3 funciones de recompensa tienen una curva de disminución similar respecto al tiempo de espera promedio, como muestra la [Figura 16](#MWTparamsRewardFn_50ep). En la "ventana" de los 50 episodios y en esta ejecución en particular, $diff\_cumulativeWaitingTime$ y $diff\_waitingTime$ se aproximan a un óptimo (mínimo) ligeramente mejor que al usar $diff\_halted$. Para la elección de la/s función/es de recompensa más apropiadas, también se tuvo en cuenta el tiempo de ejecución de cada episodio.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTparamsRewardFn_50ep">
@@ -569,7 +579,7 @@ Las 3 funciones de recompensa tienen una curva de disminución similar respecto 
   <p><i>Figura 17:</i>. Tiempo (en segundos) transcurrido durante cada episodio, para las distintas funciones de recompensa.</p>
 </div>
 
-Al utilizar la función de recompensa *diff_cumulativeWaitingTime*, se realizan muchas comunicaciones con SUMO para obtener los tiempos de espera acumulados de cada vehículo, y eso teniendo en cuenta que cada vehículo tiene asignada una memoria máxima de 100 segundo. Esto repercute enormemente en los tiempos de cálculo, como se puede ver en la [Figura 17](). En la [Tabla 6](#elapsedTimeTrainingRewardFn) vemos que el tiempo requerido para computar el entrenamiento con *diff_cumulativeWaitingTime* es aproximadamente 1.91 veces más grande que para *diff_waitingTime*. Es debido a esta demanda computacional que nos decantamos por utilizar principalmente $reward\_fn = diff\_waitingTime$.
+Al utilizar la función de recompensa $diff\_cumulativeWaitingTime$, se realizan muchas comunicaciones con SUMO para obtener los tiempos de espera acumulados de cada vehículo, y eso teniendo en cuenta que cada vehículo tiene asignada una memoria máxima de 100 segundo. Esto repercute enormemente en los tiempos de cálculo, como se puede ver en la [Figura 17](). En la [Tabla 6](#elapsedTimeTrainingRewardFn) vemos que el tiempo requerido para computar el entrenamiento con $diff\_cumulativeWaitingTime$ es aproximadamente 1.91 veces más grande que para $diff_waitingTime$. Es debido a esta demanda computacional que nos decantamos por utilizar principalmente $reward\_fn = diff\_waitingTime$.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="elapsedTimeTrainingRewardFn">
@@ -577,16 +587,16 @@ Al utilizar la función de recompensa *diff_cumulativeWaitingTime*, se realizan 
   <p><i>Tabla 6:</i> Tiempos requeridos para computar el entrenamiento del agente.</p>
 </div>
 
-| ID de función de recompensa | Tiempo requerido para entrenar al agente |
-| ----------------------------| ---------------------------------------- |
-| diff_halted                 | 1801.136 |
-| diff_waitingTime            | 1775.142 |
-| diff_cumulativeWaitingTime  | 3400.089 |
+| ID de función de recompensa  | Tiempo (en segundos) requerido para entrenar al agente |
+| ---------------------------- | ---------------------------------------- |
+| $$diff\_halted$$             | 1801.136 |
+| $$diff\_waitingTime$$        | 1775.142 |
+| $$diff\_cumulativeWaitingTime$$  | 3400.089 |
 
 
 #### $\epsilon$ inicial, $\epsilon$ final y factor de caída exponencial de $\epsilon$
 
-Hemos observado el comportamiento de tres parámetros fundamentales para la estrategia de exploración $\epsilon$-greedy: $\epsilon$ inicial, $\epsilon$ final y el factor de caída exponencial de $\epsilon$.
+Hemos observado el comportamiento de tres parámetros fundamentales para la estrategia de exploración $\epsilon$-greedy: $\epsilon$-inicial, $\epsilon$-finale y el factor de caída exponencial de $\epsilon$.
 
 Utilizamos los valores 1.0 y 0.8 para el parámetro $\epsilon$ inicial, y para $\epsilon$ final fijamos un valor cercano a 0, específicamente 0.005. También combinamos esta configuración con dos valores distintos para el factor de caída exponencial. Realizamos el entrenamiento durante 100 episodios y los resultados fueron los esperados: tanto un factor de caída exponencial más bajo como un $\epsilon$ inicial más grande permiten una mayor exploración al comienzo. 
 
@@ -597,8 +607,6 @@ Utilizamos los valores 1.0 y 0.8 para el parámetro $\epsilon$ inicial, y para $
 </div>
 
 El valor $\epsilon$ decae durante el entrenamiento con un comportamiento exponencial. Para esto hacemos uso del factor de caída exponencial. Para ajustar este parámetro, es importante tener en cuenta la cantidad de episodios de entrenamiento. Para nuestra exploración de parámetros, en la mayoría de las ejecuciones utilizamos 50 episodios. En la [Figura 19](#expEpsilonDecay_50ep) podemos ver como decae $\epsilon$ para distintos valores de este factor, con 50 episodios. En este caso, si nuestra intención es explorar bastante, pero en los últimos episodios explotar al máximo el conocimiento adquirido resulta apropiado usar un factor de caída de 0.075. En la [Figura 20](#expEpsilonDecay_200ep) vemos este decaimiento para otros valores del factor y utilizando 200 episodios de entrenamiento.
-
-
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="expEpsilonDecay_50ep">
   <img src="./images/expEpsilonDecay_50ep.png" alt="Epsilon Exponential Decay - 50 eps." height="auto" width="800">
@@ -612,6 +620,8 @@ El valor $\epsilon$ decae durante el entrenamiento con un comportamiento exponen
   <p><i>Figura 20:</i> Caída de epsilon utilizando distintos factores de caída exponencial, sobre 200 episodios.</p>
 </div>
 
+En favor de de la exploración, escogemos un $starting\_\epsilon$ igual a 1.0. Luego, dependiendo la cantidad de episodios de entrenamiento escogeremos un $decay\_rate$ que logre una curva que incremente al máximo la exploración en los primeros episodios, pero que en los episodios finales, esta tenga una probabilidad muy cercana al $ending\_\epsilon$ establecido.
+
 #### Intervalos de codificación
 
 La cantidad de intervalos que se esperan mapear, para representar los distintos estados, se indican con el parámetro $encode\_interval$. En la [Figura 21]() se observa como afecta a la convergencia de una política que maximize las recompensas, mediante la métrica de **tiempos de espera promedio**. 
@@ -619,10 +629,10 @@ La cantidad de intervalos que se esperan mapear, para representar los distintos 
 Para el análisis de este hiper-parámetro, se fijaron los siguientes:
 
 - $lane\_info=waitingTime$
-- $reward\_fn=diff\ _waitingTime$
-- $episodes = 50$. (Cantidad de episodios).
-- $starting\_\epsilon=1$. ($\epsilon$ inicial)
-- $decay\_rate=0.025$. (Factor de caída exponencial).
+- $reward\_fn=diff\_waitingTime$
+- $episodes = 50$.
+- $starting\_\epsilon=1$.
+- $decay\_rate=0.025$.
 
 Los valores de $encode\_interval$ propuestas son: 4, 6, 8, 10 y 14.
 
@@ -644,7 +654,7 @@ Mientrás mayor sea $encode\_interval$, más lenta es la convergencia, ya que ma
   <p><i>Figura 23:</i> Evolución de los tiempos de espera promedio durante 200 episodios, para <i>encode_interval</i> = 14.</p>
 </div>
 
-La cota inferior alcanzada por el agente con $encode_interval = 4$ es de aproximadamente 1.82 segundos de tiempo de espera promedio (específicamente en el episodio 125). Por otro lado, la cota inferior alcanzada por el agente con $encode_interval = 14$ es de aproximadamente 1.42 segundos de tiempo de espera promedio (específicamente en el episodio 200). Utilizar un $encode_interval$ más alto retrasa la convergencia, pero a largo plazo obtiene un tiempo de espera promedio ligeramente inferior. Dado que la ejecución de un episodio en la simulación requiere un tiempo considerable, hemos optado por un valor intermedio, específicamente $encode_interval = 10$.
+La cota inferior alcanzada por el agente con $encode\_interval = 4$ es de aproximadamente 1.82 segundos de tiempo de espera promedio (específicamente en el episodio 125). Por otro lado, la cota inferior alcanzada por el agente con $encode\_interval = 14$ es de aproximadamente 1.42 segundos de tiempo de espera promedio (específicamente en el episodio 200). Utilizar un $encode\_interval$ más alto retrasa la convergencia, pero a largo plazo obtiene un tiempo de espera promedio ligeramente inferior. Dado que la ejecución de un episodio en la simulación requiere un tiempo considerable, hemos optado por un valor intermedio, específicamente $encode\_interval = 10$.
 
 #### Learning Rate $\alpha$
 
@@ -666,7 +676,7 @@ Los valores de $learning\_rate$ propuestos son: 0.1, 0.01 y 0.001.
   <p><i>Figura 24:</i> Evolución de los tiempos de espera promedio, para distintos <i>learning rates</i>.</p>
 </div>
 
-Observando la [Figura 24](#MWTparams_lr_100ep), vemos que con $learning\_rate = 0.1$ la convergencia es muy rápida y con $learning\_rate = 0.01$ ocurre lo contrario. De forma arbitraria, y con el fin de no extender demasiado el tiempo de entrenamiento, se eligió $learning\_rate = 0.01$.
+Observando la [Figura 24](#MWTparams_lr_100ep), vemos que con $learning\_rate = 0.1$ la convergencia es muy rápida y con $learning\_rate = 0.001$ ocurre lo contrario. De forma arbitraria, y con el fin de no extender demasiado el tiempo de entrenamiento, se eligió $learning\_rate = 0.01$.
 
 
 ### Resultados del agente final
@@ -716,7 +726,7 @@ En la [Figura 27](EEPerEpisode) se observa una característica inherente del sim
 #### Escenario balanceado
 
 
-Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varían y son constantes desde los 4 puntos cardinales. Se realizaron 5 (-!!! de momento !!!-) ejecuciones de entrenamiento del agente sobre el entorno desbalanceado y se obtuvieron la **media** y **desviación estándar** para cada episodio, en cada una de las 3 métricas planteadas.
+Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varían y son constantes desde los 4 puntos cardinales. Se realizaron 5 ejecuciones de entrenamiento del agente sobre el entorno desbalanceado y se obtuvieron la **media** y **desviación estándar** para cada episodio, en cada una de las 3 métricas planteadas.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode_b">
