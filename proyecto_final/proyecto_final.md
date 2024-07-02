@@ -33,7 +33,7 @@ El otro elemento es el **entorno**, que representa el escenario con el que inter
 
 Los **Procesos de Decisión de Markov** (Markov Decision Process, en inglés) son una formalización clásica de la toma de decisiones secuencial donde las acciones no sólo influyen en las recompensas inmediatas, sino también en situaciones posteriores, o estados, y a través de ellas en las recompensas futuras. Los MDPs pretenden ser una forma matemáticamente idealizada del problema del Reinforcement Learning para el que pueden hacerse afirmaciones teóricas que nos ayudan en lo práctico. 
 
-En un MDP, el agente y el entorno interactúan en cada uno de una secuencia de pasos temporales discretos, $t = 0, 1, 2, 3, ...$. En cada paso de tiempo $t$, el agente recibe una representación del **estado** del entorno, $S_t \in \mathcal{S}$, y en esa base selecciona una **acción**, $A_t \in \mathcal{A}(s)$. Un paso de tiempo después, como consecuencia de esta acción, el agente recibe una **recompensa** numérica, $R_{t+1} \in \mathcal{R}$, y se encontrará en un nuevo estado $S_{t+1}$.
+En un MDP, el agente y el entorno interactúan en cada uno de una secuencia de pasos temporales discretos, $t = 0, 1, 2, 3, \dots$. En cada paso de tiempo $t$, el agente recibe una representación del **estado** del entorno, $S_t \in \mathcal{S}$, y en esa base selecciona una **acción**, $A_t \in \mathcal{A}(s)$. Un paso de tiempo después, como consecuencia de esta acción, el agente recibe una **recompensa** numérica, $R_{t+1} \in \mathcal{R}$, y se encontrará en un nuevo estado $S_{t+1}$.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
   <img src="./images/RL_Agent_Env.png" alt="The agent–environment interaction in a Markov decision process." id="avgTravelTimeToWork">
@@ -726,7 +726,7 @@ En la [Figura 27](EEPerEpisode) se observa una característica inherente del sim
 #### Escenario balanceado
 
 
-Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varían y son constantes desde los 4 puntos cardinales. Se realizaron 5 ejecuciones de entrenamiento del agente sobre el entorno desbalanceado y se obtuvieron la **media** y **desviación estándar** para cada episodio, en cada una de las 3 métricas planteadas.
+Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varían y son constantes desde los 4 puntos cardinales. Se realizaron 10 ejecuciones de entrenamiento del agente sobre el entorno desbalanceado y se obtuvieron la **media** y **desviación estándar** para cada episodio, en cada una de las 3 métricas planteadas.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode_b">
