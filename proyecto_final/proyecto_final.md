@@ -3,11 +3,11 @@
 ## Introducción
 El volumen de tráfico vehicular en las ciudades cada vez ha sido mayor, lo cual ha producido numerosos problemas, el principal: las **congestiones**. Muchas redes de calles fueron planificadas teniendo en cuenta determinados flujos de tráfico, los cuales han sido superados a creces. Es posible replanificar parcialmente ciertas áreas de una ciudad, expandiendo calles y avenidas, cambiando el sentido de estas, agregando semáforos; sin embargo estas son soluciones estáticas.
 
-Las congestiones en ciudades generan los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** (CO, CO2, NOx, HC). En la [Figura 1](#avgTravelTimeToWork) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
+Las congestiones en ciudades generan los siguientes problemas asociados: incremento en los **tiempos de viaje**, aumento en el número de **detenciones** (aceleraciones y desaceleraciones) y como consecuencia una mayor **emisión** de **gases nocivos para la salud** (CO, CO2, NOx, HC). En la [Figura 1](#avgTravelTimeToWork) [[2]](#ref2) se puede observar el incremento en los tiempos de viaje, a lo largo de los años en Estados Unidos. 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="avgTravelTimeToWork">
   <img src="./images/avgTravelTimeWorkUS-2016_2019.png" alt="Average Travel Time to Work in the US: 2006 to 2019">
-  <p><i>Figura 1:</i> Evolución anual del tiempo de viaje al trabajo promedio (en minutos), en los Estados Unidos.</p>
+  <p><i>Figura 1:</i> Evolución anual del tiempo de viaje al trabajo promedio (en minutos), en los Estados Unidos. </p>
 </div>
 
 Adicionalmente, muchas ciudades utilizan semáforos con programaciones estáticas, lo cual resulta en una **inflexibilidad** notable en la gestión del tráfico. Esto puede provocar situaciones como la siguiente: en una intersección de dos calles, donde el flujo mayoritario proviene del este y del oeste, puede ocurrir que, de repente, aumente significativamente el número de vehículos provenientes del norte, superando a los demás. Dado que el semáforo tiene fases de tiempo fijo y prioriza la calle este/oeste, la gestión del tráfico se vuelve ineficiente e inflexible. Otra situación puede ser cuando solo hay vehículos ingresando a la intersección desde un carril, y los conductores se encuentren con un semáforo rojo, cuando no hay otros vehículos aproximandose a la intersección. Los semáforos con ciclos fijos, son incapaces de adaptarse dinámicamente a las situaciones de tráfico, lo cual impacta negativamente en los tiempos de espera de los vehículos.
@@ -16,12 +16,16 @@ Una forma de abordar este problema es mediante el *framework* del *Reinforcement
 
 En este trabajo, se utilizó un simulador de tráfico para modelar el entorno (tráfico en intersección de avenidas). Posteriormente, se entrenó al controlador de semáforos empleando el algoritmo Q-Learning. El objetivo fué optimizar la gestión del tráfico en comparación con los semáforos de ciclo fijo, específicamente reducir el tiempo de espera promedio de todos los vehículos que ingresaron a la intersección.
 
+Este informe se encuentra divido en tres partes. La primera es el marco teórico, comprendido por capítulos que detallan conceptos relevantes, y un último capítulo que especifica terminología utilizada a lo largo del informe; la segunda describe la metodología utilizada para abordar el problema y el diseño experimental; luego, en una tercera parte, el análisis y discusión de los resultados obtenidos en el experimento. Finalmente se presentan las conclusiones.
+
+
 
 ## Marco teórico
-
+En esta sección se dan a conocer conceptos teóricos más relevantes utilizados en la solución planteada. El marco teórico ha sido extraído y/o parafraseado del libro Reinforcement learning: An introduction de Sutton, R.S. y Barto, A.G. [[1]](#ref1). Adicionalmente se incluyó terminología útil en el contexto de tráfico.
 
 ### Reinforcement Learning (RL)
-El **aprendizaje por refuerzo** (*reinforcement learning*, en inglés) consiste en mapear situaciones (estados) a acciones, con el objetivo de maximizar una señal de recompensa numérica. En el marco del aprendizaje por refuerzo, existen dos elementos esenciales: un **agente** (o más) y un **entorno**.
+
+El **aprendizaje por refuerzo** (*reinforcement learning*, en inglés) consiste en mapear situaciones (estados) a acciones, con el objetivo de maximizar una señal de recompensa numérica. En el marco del aprendizaje por refuerzo, existen dos elementos esenciales: un **agente** (o más) y un **entorno**. 
 
 El **agente** es el tomador de decisiones, al cual no se le indica explícitamente qué acciones tomar, sino que debe descubrir cuáles acciones generan más recompensas a través de la exploración y la experimentación. Generalmente, las acciones pueden afectar no solo la recompensa inmediata, sino también el estado siguiente y, a través de este, todas las recompensas futuras.
 
@@ -33,17 +37,17 @@ El otro elemento es el **entorno**, que representa el escenario con el que inter
 
 Los **Procesos de Decisión de Markov** (Markov Decision Process, en inglés) son una formalización clásica de la toma de decisiones secuencial donde las acciones no sólo influyen en las recompensas inmediatas, sino también en situaciones posteriores, o estados, y a través de ellas en las recompensas futuras. Los MDPs pretenden ser una forma matemáticamente idealizada del problema del Reinforcement Learning para el que pueden hacerse afirmaciones teóricas que nos ayudan en lo práctico. 
 
-En un MDP, el agente y el entorno interactúan en cada uno de una secuencia de pasos temporales discretos, $t = 0, 1, 2, 3, \dots$. En cada paso de tiempo $t$, el agente recibe una representación del **estado** del entorno, $S_t \in \mathcal{S}$, y en esa base selecciona una **acción**, $A_t \in \mathcal{A}(s)$. Un paso de tiempo después, como consecuencia de esta acción, el agente recibe una **recompensa** numérica, $R_{t+1} \in \mathcal{R}$, y se encontrará en un nuevo estado $S_{t+1}$.
+En un MDP, el agente y el entorno interactúan en cada uno de una secuencia de pasos temporales discretos, $t = 0, 1, 2, 3, \dots$. En cada paso de tiempo $t$, el agente recibe una representación del **estado** del entorno, $S_t \in \mathcal{S}$, y en esa base selecciona una **acción**, $A_t \in \mathcal{A}(s)$. Un paso de tiempo después, como consecuencia de esta acción, el agente recibe una **recompensa** numérica, $R_{t+1} \in \mathcal{R}$, y se encontrará en un nuevo estado $S_{t+1}$. Todo este proceso se puede observar en la [Figura 2](#agent-env-Interaction).
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
-  <img src="./images/RL_Agent_Env.png" alt="The agent–environment interaction in a Markov decision process." id="avgTravelTimeToWork">
-  <p><i>Figura 2:</i> Interacción agente-entorno en proceso de decisión de Markov</p>
+  <img src="./images/RL_Agent_Env.png" alt="The agent–environment interaction in a Markov decision process." id="agent-env-Interaction">
+  <p><i>Figura 2:</i> Interacción agente-entorno en proceso de decisión de Markov (Sutton, R.S. and Barto, A.G (2020), p. 48)</p>
 </div>
 
 En los **MDPs finitos**, los conjuntos de estados, acciones y recompensas ($\mathcal{S}$, $\mathcal{A}$ y $\mathcal{R}$) contienen un número finito de elementos. Las variables aleatorias $R_t$ y $S_t$ siguen una distribución de probabilidad discreta $p$, la cual depende únicamente del estado y la acción precedentes. Esta dependencia exclusiva se conoce como la propiedad de Markov, y para las metodologías a utilizar se asume el cumplimiento de esta.
 
 $$
-p(s',r|s,a) = Pr\{ S_t=s', R_t=r | S_{t-1} = s, A_{t-1}=a \}.
+p(s',r|s,a) = Pr \lbrace S_t=s', R_t=r | S_{t-1} = s, A_{t-1}=a \rbrace.
 $$
 
 Existen métodos que intentan desarrollar un modelo para comprender el entorno. Estos métodos intentan aprender esta función de probabilidad $p$ para poder planificar, y se les dice *basados-en-modelo*. Por otro lado tenemos los algoritmos *libres-de-modelo* que buscan aprender las consecuencias de las acciones a través de la experiencia. Esto lo hacen sin estimar la función $p$, y son el grupo de algoritmos de interés para este trabajo.
@@ -54,11 +58,13 @@ Como se dijo, el objetivo del agente es maximizar la recompensa acumulada recibi
 
 $$G_t = R_{t+1} + R_{t+2} + R_{t+3} + ... + R_T,$$
 
-dónde $T$ es el paso de tiempo final.
+dónde $T$ es el paso de tiempo final. Las tareas con episodios se llaman **tareas episódicas**. 
 
-En muchos casos se debe destacar la fortaleza que tiene las recompensas más lejanas (en el tiempo) frente a las recompensas inmediatas, para esto usamos un *factor de descuento* $\gamma$. El factor de descuento $\gamma$ es un parámetro, $0 \leq \gamma \leq 1$ y lo usamos para obtener el **retorno descontado**:
+Por otra parte, en muchos casos la interacción agente-entorno no se rompe de forma natural en episodios identificables, sino que se prolonga continuamente sin límites. A estas tareas, se las denomina **tareas continuas**, y la ecuación anterior resulta problemática ya que $T=\infty$. Para enfrentar este problema utilizamos el concepto de descuento.
 
-$$ G_t = R_{t+1} + \gamma R_{t+2} + \gamma ^{2} R_{t+3} + ... + = \sum_{t=0}^{T} R_{t+1}. $$
+En muchos casos se debe destacar la fortaleza que tienen las recompensas más lejanas (en el tiempo) frente a las recompensas inmediatas, para esto usamos un *factor de descuento* $\gamma$. El factor de descuento $\gamma$ es un parámetro, $0 \leq \gamma \leq 1$ y lo usamos para obtener el **retorno descontado**:
+
+$$ G_t = R_{t+1} + \gamma R_{t+2} + \gamma ^{2} R_{t+3} + ... = \sum_{t=0}^{\infty.} R_{t+1}. $$
 
 
 ### Función de acción-valor y política
@@ -74,6 +80,7 @@ Tanto $V_{\pi}$ como $Q_{\pi}$ pueden ser estimados desde la experiencia. Estas 
 
 ### Q-learning
 
+
 Una propiedad fundamental de $Q_*$ es que debe satisfacer la siguiente ecuación:
 
 $$Q_* (s,a) = E \left[ R_{t+1} + \gamma \max_{a'} Q_*(S_{t+1},a') \mid S_t = s, A_t = a \right].$$
@@ -84,13 +91,33 @@ $$ Q(S_t, A_t) \leftarrow Q(S_t, A_t) + \alpha \left[ R_{t+1} + \gamma \max_{a} 
 
 Donde $\alpha$ es la *tasa de aprendizaje*, un parámetro que controla la rapidez con la que los valores de $Q$ convergen hacia los óptimos. Este proceso se repite hasta que los valores de $Q$ converjan o hasta que se alcance un cierto número de iteraciones.
 
+Q-learning es un **enfoque sin modelo**, lo cual resulta útil en nuestros escenarios de tráfico, dónde la dinámica es desconocida y difícil de modelar para nuestro agente. Este algoritmo es simple, tarde o temprano converge y adicionalmente, ya ha sido utilizado en problemas similares. 
+
+
+### Exploración vs. Explotación
+
+En un problema de Reinforcement Learning es importante lograr un buen balance entre la **exploración** del espacio de acciones ante un estado determinado, y la **explotación** de las acciones que otorgan una mejor recompensa. Es importante realizar una buena exploración del entorno, ya que sino es posible que el agente se atasque en un óptimo local. Tampoco hay que excederse en la exploración, ya que esto produce una recompensa acumulada baja. 
+
+Una de las estrategias de exploración más utilizadas es $\epsilon$-greedy. En Q-learning, se selecciona una acción basado en la recompensa esperada. El agente siempre elije la acción óptima, de forma tal que se maximize el retorno desde el estado actual. Si seguimos una política $\epsilon$-greedy, para seleccionar la próxima acción, el agente seleccionará la acción que maximize la recompensa con una probabilidad de $1-\epsilon$. Caso contrario, eligirá una acción de forma aleatoria. 
+
+$$
+a = 
+\begin{cases} 
+    \max_{a} Q(s,a) & \text{con probabilidad } 1 - \epsilon  \\
+    aleatoria & \text{caso contrario}
+\end{cases}
+$$
+
+A medida que se avanza en los episodios de entrenamiento del agente, el valor de $\epsilon$ disminuye. Esto da como resultado una disminución en la exploración a medida que nos acercamos a los últimos episodios de entrenamiento. Para nuestro problema se decidió utilizar un decaimiento exponencial, que utiliza un  parámetro llamado **factor de caída**, para hacer decaer más rápido o mas lentamente el valor de $\epsilon$.
+
 ### Terminología utilizada
 
-A continuación se daran las definiciones de terminología importante a la hora de explicar la solución propuesta y discutir los resultados.
+A continuación se daran las definiciones de terminología importante a la hora de explicar la solución propuesta y discutir los resultados. Todas las definiciones incluidas fueron extraídas de la presentación realizada por Hua Wei, Zhenhui Li, Vikash Gayah en IEEE ITSC‘20 Tutorial [[9]](#ref9), y de la documentación de SUMO [[3]](#ref3).
 
-**Carril** (*lane*): Una intersección está compuesta por una conjunto de carriles. Hay dos tipos de carriles: carriles entrantes y carriles salientes.
+**Carril** (*lane*): Una intersección está compuesta por una conjunto de carriles. Hay dos tipos de carriles: carriles entrantes y carriles salientes. Como se muestra en la [Figura 3](#intersectionElements).
 
-**Enlace** (*link*): Un enlace es una conexión entre carriles. Definen los posibles movimientos en un carril.
+**Enlace** (*link*): Un enlace es una conexión entre carriles. Definen los posibles movimientos en un carril. Como se muestra en la [Figura 3](#intersectionElements).
+
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
@@ -108,7 +135,7 @@ A continuación se daran las definiciones de terminología importante a la hora 
 
 - Verde claro (con prioridad): movimiento permitido, con prioridad.
 
-**Fase**: Una fase es una combinación de señales de movimiento. Definen el estado de un semáforo.
+**Fase**: Una fase es una combinación de señales de movimiento. Definen el estado de un semáforo. En la [Figura 4](#trafficSignals) se puede observar un ejemplo de fase en una intersección de cuatro carriles.
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;">
   <img src="./images/trafficSignals.png" alt="Traffic Signals in SUMO." id="trafficSignals" width="600">
@@ -166,7 +193,7 @@ Para cambiar el estado del tráfico usamos:
 
 #### Diseño del escenario
 
-Un archivo de red para SUMO describe la parte de un mapa relacionada con el tráfico, las calles e intersecciones por las que circulan los vehículos simulados. Esta red se representa mediante un gráfico dirigido, dónde los nodos representan intersecciones o fines de carreteras, y las aristas calles. Una red SUMO contiene la siguiente información:
+Un archivo de red para SUMO describe la parte de un mapa relacionada con el tráfico, las calles e intersecciones por las que circulan los vehículos simulados. Esta red se representa mediante un grafo dirigido, dónde los nodos representan intersecciones o fines de carreteras, y las aristas calles. Una red SUMO contiene la siguiente información:
 
 - Cada calle (arista) como una colección de carriles, incluyendo la posición, forma y límite de velocidad de cada carril.
 - Semáforos con sus programas, referenciadas por intersecciones.
@@ -238,7 +265,7 @@ Desde los 4 nodos que no intersectan (exteriores), se generarán vehículos sigu
 | 8-12 Hs | 0.1695 | 0.1808 | 0.2208 | 0.2477 |
 
 
-Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, está constituido por tres flujos con rutas distintas. Cuando se genera un vehículo desde un punto de origen, este aleatoriamente elige una de estas rutas.
+Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, está constituido por tres flujos con rutas distintas. Cuando se genera un vehículo desde un punto de origen, este aleatoriamente elige una de estas rutas, con cierta probabilidad, como se observa en la [Figura 8](#routeProbabilites).
 
 - Ruta de vehículos que girarán a la **izquierda***. Con una probabilidad de 0.08.
 - Ruta de vehículos que seguirán **recto**. Con una probabilidad de 0.7.
@@ -253,7 +280,7 @@ Cada uno de los flujos, tanto del escenario balanceado como el desbalanceado, es
 
 
 
-Más [adelante](#ObservacionSobreLaRecompensaAcumulada) se explica un fenómeno que ocurre al calcular las recompensa acumuladas sobre estos escenarios. Cuando se ejecutan desde el inicio hasta el final, cuando no queden vehículos circulando en la intersección, ocurre que las recompensas acumuladas en el episodio se anulan (igual a 0). Para atenuar este comportamiento se procede a ejecutar 10 minutos de "calentamiento" (una simulación no observada) antes de comenzar con la simulación a observar. Y cuando se llega a un tiempo determinado (12 horas y 10 minutos en todos los escenarios), se finaliza el episodio abruptamente. 
+En la sección [Observación sobre la recompensa acumulada](#ObservacionSobreLaRecompensaAcumulada) se explica un fenómeno que ocurre al calcular las recompensa acumuladas sobre estos escenarios. Cuando se ejecutan desde el inicio hasta el final, cuando no queden vehículos circulando en la intersección, ocurre que las recompensas acumuladas en el episodio se anulan (igual a 0). Para atenuar este comportamiento se procede a ejecutar 10 minutos de "calentamiento" (una simulación no observada) antes de comenzar con la simulación a observar. Y cuando se llega a un tiempo determinado (12 horas y 10 minutos en todos los escenarios), se finaliza el episodio abruptamente. 
 
 
 ### Agente
@@ -267,7 +294,6 @@ Este agente Q-learning podrá observar parcialmente el entorno simulado (estados
   <p><i>Figura 9:</i> Arquitectura del sistema de <i>Reinforcement Learning</i>.</p>
 </div>
 
-Q-learning es un **enfoque sin modelo**, lo cual resulta útil en nuestros escenarios de tráfico, dónde la dinámica es desconocida y difícil de modelar para nuestro agente. Este algoritmo es simple, tarde o temprano converge y adicionalmente, ya ha sido utilizado en problemas similares. 
 
 El mayor desafío de este método recae en la poca escalabilidad, ya que el rendimiento empeora a medida que crece la Q-table. Para lograr un aprendizaje eficiente se tuvieron que ajustar varios parámetros como la tase de aprendizaje $\gamma$, la cantidad de intervalos posibles en los estado, la información utilizada a la hora de representar un estado y otros más.
 
@@ -323,7 +349,7 @@ La elección entre utilizar la cantidad de vehículos detenidos o el tiempo de e
 #### Codificación de estados
 Si en cada carril hay una gran cantidad de vehículos el tamaño de la Q-table puede escalar mucho. Por eso, se utilizará un parámetro $I$ (Intervalos esperados), para gestionar el tamaño de la tabla. Sea $M$ el valor máximo esperado, se cumple $I \leq M$.
 
-Para discretizar el espacio de estados a un número finito se utilizó una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario ($I$ cercano a $M$), el comportamiento se aproximará al lineal (intervalos regulares).
+Para discretizar el espacio de estados a un número finito se utilizó una función con comportamiento logarítmico mientras más se aleje $I$ de $M$. Caso contrario ($I$ cercano a $M$), el comportamiento se aproximará al lineal (intervalos regulares). En esta función $x$ puede representar tanto la cantidad de vehículos detenidos en un carril, como el tiempo de espera en un carril.
 
 Justificación:  Cuando tenenemos 0, 1, 2, 3 o 4 vehículos puede tener sentido diferenciar cada uno de estos valores, utilizando una función que codifique intervalos regulares. Pero cuando hay 22, 23 o 24 vehículos, no existe gran diferencia entre estos valores, en el contexto del estado de tráfico.
 
@@ -348,6 +374,12 @@ En la [Figura 10](#logLinearBlend1) y en la [Figura 11](#logLinearBlend2), podem
 
 Para nuestros experimentos fijamos, de forma semi-arbitraria, el parámetro $M$. En el caso de usar la cantidad de vehículos detenidos por carril, para la representación del estado, elegimos $M=30$. Pues, en cada carril entran aproximadamente 30 vehículos, aunque también se cuentan los que estan en cola de espera fuera de la red. Si usamos el tiempo de espera por carril para representar estados, entonces $M=500$. Por otro lado, $M=500$ fué elegido pensando en que este valor es "suficientemente alto" para la suma de tiempos de espera de un carril. Estas selecciones se hicieron observando visualmente la dinámica de tráfico en un escenario desbalanceado. Téngase en cuenta que $I$ no representa la cantidad máxima de valores que pueden ser mapeados por la función, de manera similar a lo que sucede con $M$.
 
+Una vez capturada la fase actual del semáforo ($current\_phase$), y codificado cada valor de información (cantidad de vehículos o tiempo de espera) de todos los carriles ($lane\_info\_0, lane\_info\_1, \dots, lane\_info\_n$), un estado queda representado mediante la siguiente tupla:
+
+$$
+(current\_phase, lane\_info\_0, lane\_info\_1, \dots, lane\_info\_n)
+$$
+
 
 
 ### Funciones de recompensa
@@ -371,7 +403,7 @@ $$R_{t+1} = W_{t} - W_{t+1}.$$
 #### Recompensa: Cambio en la cantidad de vehículos detenidos
 Otra métrica de interés es la cantidad de detenciones de los vehículos. Para esta, proponemos como función de recompensa el **cambio en la cantidad de vehículos detenidos** entre el paso de tiempo actual y el anterior. 
 
-Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $h_l$ la cantidad de vehículos, cuya velocidad es inferior a 0.1 m/s (detenido) y se encuentran en el carril $l$ en el instante $t$. $W_t$ es el tiempo total de espera en el instante $t$, definido como:
+Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $h_l$ la cantidad de vehículos, cuya velocidad es inferior a 0.1 m/s (detenido) y se encuentran en el carril $l$ en el instante $t$. $H_t$ es el tiempo total de espera en el instante $t$, definido como:
 
 $$H_t = \sum_{l=1}^{L} h_l^t.$$
 
@@ -402,21 +434,6 @@ Entonces, la diferencia del tiempo de espera acumulado en el instante $t$ respec
 
 $$R_{t+1} = CW_{t} - CW_{t+1}.$$
 
-### Exploración vs. Explotación
-
-En un problema de Reinforcement Learning es importante lograr un buen balance entre la **exploración** del espacio de acciones ante un estado determinado, y la **explotación** de las acciones que otorgan una mejor recompensa. Es importante realizar una buena exploración del entorno, ya que sino es posible que el agente se atasque en un óptimo local. Tampoco hay que excederse en la exploración, ya que esto produce una recompensa acumulada baja. 
-
-Una de las estrategias de exploración más utilizadas es $\epsilon$-greedy. En Q-learning, se selecciona una acción basado en la recompensa esperada. El agente siempre elije la acción óptima, de forma tal que se maximize el retorno desde el estado actual. Si seguimos una política $\epsilon$-greedy, para seleccionar la próxima acción, el agente seleccionará la acción que maximize la recompensa con una probabilidad de $1-\epsilon$. Caso contrario, eligirá una acción de forma aleatoria. 
-
-$$
-a = 
-\begin{cases} 
-    \max_{a} Q(s,a) & \text{con probabilidad } 1 - \epsilon  \\
-    aleatoria & \text{caso contrario}
-\end{cases}
-$$
-
-A medida que se avanza en los episodios de entrenamiento del agente, el valor de $\epsilon$ disminuye. Esto da como resultado una disminución en la exploración a medida que nos acercamos a los últimos episodios de entrenamiento. Para nuestro problema se decidió utilizar un decaimiento exponencial, que utiliza un  parámetro llamado **factor de caída**, para hacer decaer más rápido o mas lentamente el valor de $\epsilon$.
 
 ### Métricas
 Las métricas son fundamentales para entender cómo de bien está funcionando nuestro agente. Las métricas proporcionan una base para comparar diferentes agentes y determinar cuáles son más eficaces. Estas se utilizaron para la selección de hiperparámetros y para comparar resultados con el *baseline*. Si ciertos hiperparámetros tienen deficiencias, las métricas permiten observarlas y corregirlas.
@@ -464,7 +481,7 @@ Para evaluar el desempeño del agente Q-learning en la gestión de semáforos, h
   <p><i>Tabla 5:</i> Secuencia de fases del controlador de semáforos con tiempos fijos.</p>
 </div>
 
-| Identificador |      Estado      | Duración (en s) | 
+| Identificador |      Fase        | Duración (en segundos) | 
 | ------------- | ---------------- | --------------- |
 |    ns_sw_l    | GGGgrrrrGGGgrrrr |        30       |
 |   Y_ns_sw_l   | yyyyrrrryyyyrrrr |        4        |
@@ -487,7 +504,7 @@ El éxito del agente propuesto depende en gran medida de la configuración adecu
 - **Factor de aprendizaje** (*learning rate*, $\alpha$)
 
 
-De los hiper-parámetros nombrados: *delta time*, el tiempo de duración de la fase amarilla y el factor de descuento, fueron elegidos de forma análitica. A partir de estas selecciones, se fijaron para todo el proceso de experimentación.
+De los hiper-parámetros nombrados: *delta time*, el tiempo de duración de la fase amarilla y el factor de descuento, fueron elegidos de forma empírica y semi-arbitraria. A partir de estas selecciones, se fijaron para todo el proceso de experimentación.
 
 #### Duración de la fase amarilla
 La **duración de la fase amarilla** se ha fijado en **4 segundos** tras observaciones experimentales en simulaciones. Un tiempo inferior causaba muchas situaciones de "frenado de emergencia" para evitar colisiones, alterando el comportamiento natural de conducción de los vehículos. Con 4 segundos, los conductores pueden reaccionar de manera segura y gradual al cruzar la intersección, reduciendo la fluidez del tráfico. Esta selección minimizó los "frenados de emergencia".
@@ -505,7 +522,7 @@ En nuestro experimiento, nos interesan todas las recompensas obtenidas en cada p
 En esta sección, se presentan los resultados tanto de la exploración de hiper-parámetros, como de los resultados sobre nuestro modelo final de Reinforcement Learning. Finalmente, los resultados del modelo se comparán con los de un sistema *baseline* (semáforo con programación fija).
 
 ### Exploración de hiper-parámetros
-En esta subsección, exploramos y seleccionamos los hiper-parámetros más adecuados para nuestro sistema. Estos fueron determinados mediante una base empírica y/o analítica sobre nuestro **escenario balanceado**. Para ajustar cada uno de los hiper-parámetros se fijaron, de forma arbitraria, los demás (que no hayan sido evaluados).
+En esta subsección, exploramos y seleccionamos los hiper-parámetros más adecuados para nuestro sistema. Estos fueron determinados mediante una base empírica sobre nuestro **escenario balanceado**. Para ajustar cada uno de los hiper-parámetros se fijaron, de forma arbitraria, los demás (que no hayan sido evaluados).
 
 
 #### Información del Estado
@@ -782,7 +799,7 @@ Con el fin de comparar el rendimiento de nuestro agente frente a los semáforos 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="QLAvsSTL">
   <img src="./images/QLAvsSTL.png" alt="EE_QA_DiffCWT" width="800" height="auto">
-  <p><i>Figura 33:</i> Tiempo de espera promedio del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, frente a semáforo con tiempos fijos, sobre un escenario desbalanceado.</p>
+  <p><i>Figura 34:</i> Tiempo de espera promedio del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, frente a semáforo con tiempos fijos, sobre un escenario desbalanceado.</p>
 </div>
 
 ## Conclusiones
@@ -791,7 +808,7 @@ Con el objetivo de mejorar la gestión del tráfico mediante semáforos, se prop
 
 El otro componente esencial del *Reinforcement Learning* es el agente, el cual debe aprender una política óptima para gestionar las fases de un semáforo en una intersección. Esta política se ejecuta basándose en los valores acción-estado (Q-values) estimados durante el entrenamiento, siguiendo el algoritmo **Q-learning**. Para evitar que el agente se quede atrapado en óptimos locales y busque mejores soluciones, se utilizó una estrategia epsilon-greedy durante el entrenamiento.
 
-De forma analítica, se determinaron los hiperparámetros más relevantes para ajustarlos y lograr un mejor rendimiento del sistema. Se exploraron valores para estos hiperparámetros que maximizaran las recompensas obtenidas sin requerir un gran tiempo de cómputo, debido a las limitaciones de hardware y la poca escalabilidad inherente al método tabular Q-learning. La función de recompensa utilizada por el sistema es parametrizable y resulta crucial que esté bien definida para lograr un aprendizaje efectivo. La mejor candidata fué la diferencia de tiempos de espera entre pasos de tiempo consecutivos. Posteriormente, se propuso una alternativa ligeramente superior, aunque más demandante en términos de cómputo: la diferencia entre tiempos de espera acumulados entre pasos de tiempo consecutivos.
+De forma empírica y semi-arbitraria, se determinaron los hiperparámetros más relevantes para ajustarlos y lograr un mejor rendimiento del sistema. Se exploraron valores para estos hiperparámetros que maximizaran las recompensas obtenidas sin requerir un gran tiempo de cómputo, debido a las limitaciones de hardware y la poca escalabilidad inherente al método tabular Q-learning. La función de recompensa utilizada por el sistema es parametrizable y resulta crucial que esté bien definida para lograr un aprendizaje efectivo. La mejor candidata fué la diferencia de tiempos de espera entre pasos de tiempo consecutivos. Posteriormente, se propuso una alternativa ligeramente superior, aunque más demandante en términos de cómputo: la diferencia entre tiempos de espera acumulados entre pasos de tiempo consecutivos.
 
 Finalmente, se entrenó al agente en los escenarios de tráfico planteados, utilizando las dos funciones de recompensa mencionadas. El agente Q-learning logró aprender una política que mejoró notablemente el rendimiento en todas las métricas planteadas. Tanto en el escenario balanceado como en el desbalanceado, y utilizando las dos funciones de recompensa, se logró una mejoría respecto al sistema de referencia, que consiste en un semáforo tradicional (de tiempos fijos) de dos fases. Los resultados muestran que se cumplieron las expectativas de la solución propuesta, reduciendo los tiempos de espera de los vehículos y, en consecuencia, las congestiones.
 
@@ -814,22 +831,25 @@ Para mejorar el rendimiento y la escalabilidad de nuestro sistema, se invita a i
 1. Sutton, R.S. and Barto, A.G. (2020) Reinforcement learning: An introduction. Cambridge, MA: The MIT Press. 
 <div id="ref2"></div>
 
-2. SUMO Documentation (2024). Available at: https://sumo.dlr.de/docs/. 
+2. Travel time to work in the United States: 2019. Available at: https://www.census.gov/content/dam/Census/library/publications/2021/acs/acs-47.pdf. 
 <div id="ref3"></div>
 
-3. Liang, X. et al. (2019) 'A deep reinforcement learning network for traffic light cycle control,' IEEE Transactions on Vehicular Technology, 68(2), pp. 1243–1253. https://doi.org/10.1109/tvt.2018.2890726.
+3. SUMO Documentation (2024). Available at: https://sumo.dlr.de/docs/. 
 <div id="ref4"></div>
 
-4. Raeis, M. and Leon-Garcia, A. (2021) ‘A deep reinforcement learning approach for Fair Traffic Signal Control’, 2021 IEEE International Intelligent Transportation Systems Conference (ITSC) [Preprint]. doi:10.1109/itsc48978.2021.9564847. 
+4. Liang, X. et al. (2019) 'A deep reinforcement learning network for traffic light cycle control,' IEEE Transactions on Vehicular Technology, 68(2), pp. 1243–1253. https://doi.org/10.1109/tvt.2018.2890726.
 <div id="ref5"></div>
 
-5. Wei, H. et al. (2019) A survey on traffic signal control methods. https://arxiv.org/abs/1904.08117.
+5. Raeis, M. and Leon-Garcia, A. (2021) ‘A deep reinforcement learning approach for Fair Traffic Signal Control’, 2021 IEEE International Intelligent Transportation Systems Conference (ITSC) [Preprint]. doi:10.1109/itsc48978.2021.9564847. 
 <div id="ref6"></div>
 
-6. Bálint, K., Tamás, T. and Tamás, B. (2022) 'Deep Reinforcement Learning based approach for Traffic Signal Control,' Transportation Research Procedia, 62, pp. 278–285. https://doi.org/10.1016/j.trpro.2022.02.035.
+6. Wei, H. et al. (2019) A survey on traffic signal control methods. https://arxiv.org/abs/1904.08117.
 <div id="ref7"></div>
 
-7. Lucas N. Alegre - SUMO-RL 1.4.5 documentation. https://lucasalegre.github.io/sumo-rl/.
+7. Bálint, K., Tamás, T. and Tamás, B. (2022) 'Deep Reinforcement Learning based approach for Traffic Signal Control,' Transportation Research Procedia, 62, pp. 278–285. https://doi.org/10.1016/j.trpro.2022.02.035.
 <div id="ref8"></div>
 
-8. Hua Wei, Zhenhui Li, Vikash Gayah (2020) IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides) https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p
+8. Lucas N. Alegre - SUMO-RL 1.4.5 documentation. https://lucasalegre.github.io/sumo-rl/.
+<div id="ref9"></div>
+
+9. Hua Wei, Zhenhui Li, Vikash Gayah (2020) IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides) https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p
