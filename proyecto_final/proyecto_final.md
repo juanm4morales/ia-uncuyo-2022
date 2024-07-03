@@ -31,8 +31,6 @@ El **agente** es el tomador de decisiones, al cual no se le indica explícitamen
 
 El otro elemento es el **entorno**, que representa el escenario con el que interactúa el agente. Este entorno debe modelarse (mediante abstracción) de tal manera que la interfaz de comunicación que ofrezca al agente contenga lo esencial para computar el proceso de aprendizaje. Para modelar este entorno usamos ideas de la teoría de sistemas dinámicos, específicamente de los procesos de decisión de Markov.
 
-
-
 ### Markov Decision Process (MDP)
 
 Los **Procesos de Decisión de Markov** (Markov Decision Process, en inglés) son una formalización clásica de la toma de decisiones secuencial donde las acciones no sólo influyen en las recompensas inmediatas, sino también en situaciones posteriores, o estados, y a través de ellas en las recompensas futuras. Los MDPs pretenden ser una forma matemáticamente idealizada del problema del Reinforcement Learning para el que pueden hacerse afirmaciones teóricas que nos ayudan en lo práctico. 
@@ -152,8 +150,10 @@ A continuación se daran las definiciones de terminología importante a la hora 
 
 **Tiempo de espera acumulado de un vehículo**: se define como el tiempo de espera acumulado (en segundos) en el que el vehículo ha permanecido con una velocidad inferior a 0.1 m/s (detención).
 
-## Diseño Experimental
+## Metodología y Diseño Experimental
 Nuestro objetivo principal es maximizar la recompensa definida, lo cual producirá una reducción en los tiempos de espera de los vehículos simulados y una gestión de tráfico eficiente para un entorno dinámico. De forma secundaria, también nos interesa que los tiempos de ejecución no sean muy altos. Por lo tanto, los parámetros de nuestro agente deben satisfacer los dos objetivos.
+
+Una ayuda importante para la estructura e implementación del proyecto ha sido el repositorio encontrado en la web del projecto SUMO-RL de Lucas N. Alegre [[8]](#ref8). El cual ha servido de guía para el cálculo de una de las funciones de recompensa utilizadas y, junto a los tutoriales de SUMO [[2]](#ref2), comprender la forma de interactuar con la simulación.
 
 ### Entorno
 
@@ -401,7 +401,7 @@ $$R_{t+1} = W_{t} - W_{t+1}.$$
 
 
 #### Recompensa: Cambio en la cantidad de vehículos detenidos
-Otra métrica de interés es la cantidad de detenciones de los vehículos. Para esta, proponemos como función de recompensa el **cambio en la cantidad de vehículos detenidos** entre el paso de tiempo actual y el anterior. 
+Otra métrica de interés es la cantidad de detenciones de los vehículos, utilizada en el trabajo de . Para esta, proponemos como función de recompensa el **cambio en la cantidad de vehículos detenidos** entre el paso de tiempo actual y el anterior. 
 
 Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $h_l$ la cantidad de vehículos, cuya velocidad es inferior a 0.1 m/s (detenido) y se encuentran en el carril $l$ en el instante $t$. $H_t$ es el tiempo total de espera en el instante $t$, definido como:
 
@@ -424,7 +424,7 @@ Tanto para la función de recompensa mediante la diferencia en el tiempo de espe
 En la sección de [Diseño del Flujo de Tráfico](#DiseniodelFlujoDeTrafico), se diseñaron los escenarios de forma tal que se disminuya un poco este comportamiento. Sin embargo este fénomeno perjudica a la interpretabilidad de la recompensa acumulada a lo largo de los episodios, como se puede observar en los resultados.
 
 #### Recompensa: Cambio en los tiempos de espera acumulados
-Debido a la observación anterior se propone una tercera función de recompensa que permite visualizar la evolución de la recompensa acumulada. Esta se calcula con el **cambio en los tiempos de espera acumulados** entre el paso de tiempo actual y el anterior.
+Debido a la observación anterior se propone una tercera función de recompensa, utilizada en el trabajo de Liang, X. et al. (2019) [[4]](#ref4) e incluida en el repositorio de Lucas N. Alegre [[8]](#ref8), que permite visualizar la evolución de la recompensa acumulada. Esta se calcula con el **cambio en los tiempos de espera acumulados** entre el paso de tiempo actual y el anterior.
 
 Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $N_l$ la cantidad de vehículos en el carril $l$, y $cw_{l_i}$ el tiempo de espera acumulado del vehículo $i$ en el carril $l$ en el instante $t$. $CW_t$ es el tiempo acumulado total de espera en el instante $t$, definido como:
 
@@ -515,7 +515,7 @@ El **delta time** ($\Delta t$) representa el intervalo de tiempo (en segundos) e
 
 #### Factor de descuento $\gamma$
 
-En nuestro experimiento, nos interesan todas las recompensas obtenidas en cada paso de tiempo, durante cada episodio de simulación. Siguiendo la elección realizada en trabajos relacionados [[3]](#ref3)[[4]](#ref4), usamos un *discount factor* cercano al 1, específicamente **0.99** para indicar que nos interesan "mucho" las recompensas inmediatas y también las lejanas. 
+En nuestro experimiento, nos interesan todas las recompensas obtenidas en cada paso de tiempo, durante cada episodio de simulación. Siguiendo la elección realizada en trabajos relacionados [[4]](#ref3)[[5]](#ref4), usamos un *discount factor* cercano al 1, específicamente **0.99** para indicar que nos interesan "mucho" las recompensas inmediatas y también las lejanas. 
 
 
 ## Análisis y discusión de resultados
@@ -596,7 +596,7 @@ Las 3 funciones de recompensa tienen una curva de disminución similar respecto 
   <p><i>Figura 17:</i>. Tiempo (en segundos) transcurrido durante cada episodio, para las distintas funciones de recompensa.</p>
 </div>
 
-Al utilizar la función de recompensa $diff\_cumulativeWaitingTime$, se realizan muchas comunicaciones con SUMO para obtener los tiempos de espera acumulados de cada vehículo, y eso teniendo en cuenta que cada vehículo tiene asignada una memoria máxima de 100 segundo. Esto repercute enormemente en los tiempos de cálculo, como se puede ver en la [Figura 17](). En la [Tabla 6](#elapsedTimeTrainingRewardFn) vemos que el tiempo requerido para computar el entrenamiento con $diff\_cumulativeWaitingTime$ es aproximadamente 1.91 veces más grande que para $diff_waitingTime$. Es debido a esta demanda computacional que nos decantamos por utilizar principalmente $reward\_fn = diff\_waitingTime$.
+Al utilizar la función de recompensa $diff\_cumulativeWaitingTime$, se realizan muchas comunicaciones con SUMO para obtener los tiempos de espera acumulados de cada vehículo, y eso teniendo en cuenta que cada vehículo tiene asignada una memoria máxima de 100 segundo. Esto repercute enormemente en los tiempos de cálculo, como se puede ver en la [Figura 17](#MWTparamsRewardFn_50ep). En la [Tabla 6](#elapsedTimeTrainingRewardFn) vemos que el tiempo requerido para computar el entrenamiento con $diff\_cumulativeWaitingTime$ es aproximadamente 1.91 veces más grande que para $diff\_waitingTime$. Es debido a esta demanda computacional que nos decantamos por utilizar principalmente $reward\_fn = diff\_waitingTime$.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="elapsedTimeTrainingRewardFn">
@@ -615,7 +615,7 @@ Al utilizar la función de recompensa $diff\_cumulativeWaitingTime$, se realizan
 
 Hemos observado el comportamiento de tres parámetros fundamentales para la estrategia de exploración $\epsilon$-greedy: $\epsilon$-inicial, $\epsilon$-finale y el factor de caída exponencial de $\epsilon$.
 
-Utilizamos los valores 1.0 y 0.8 para el parámetro $\epsilon$ inicial, y para $\epsilon$ final fijamos un valor cercano a 0, específicamente 0.005. También combinamos esta configuración con dos valores distintos para el factor de caída exponencial. Realizamos el entrenamiento durante 100 episodios y los resultados fueron los esperados: tanto un factor de caída exponencial más bajo como un $\epsilon$ inicial más grande permiten una mayor exploración al comienzo. 
+Utilizamos los valores 1.0 y 0.8 para el parámetro $\epsilon$ inicial, y para $\epsilon$ final fijamos un valor cercano a 0, específicamente 0.005. También combinamos esta configuración con dos valores distintos para el factor de caída exponencial. Realizamos el entrenamiento durante 100 episodios y los resultados observados en la [Figura 18](#MWTparamsRewardFn_50ep) fueron los esperados: tanto un factor de caída exponencial más bajo como un $\epsilon$ inicial más grande permiten una mayor exploración al comienzo. 
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTparamsRewardFn_50ep">
@@ -748,20 +748,22 @@ Lo mismo se hizo sobre nuestro escenario balanceado, dónde los flujos no varía
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="MWTPerEpisode_b">
   <img src="./images/MeanWaitingTimePerEpisode_B.png" alt="MWTPerEpisode_b" width="800" height="auto">
-  <p><i>Figura 28:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 28:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario balanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
-Observando la [Figura 28](#MWTPerEpisode_b), podemos observar que para este escenario en particular, la curva de disminución del tiempo de espera promedio es un poco diferente a la del escenario desbalanceado. La pendiente de la curva disminuye notablemente durante los primeros 50 episodios y luego durante los siguientes 75 episodios la pendiente se acerca a 0, para luego disminuir nuevamente hasta el episodio final (200). Como se puede ver en el [Diseño del Flujo de Tráfico](DiseniodelFlujoDeTrafico), el escenario desbalanceado tiene un flujo constante de vehículos durante cada episodio, pero es superior en cuanto a cantidad de vehículos generados, frente al escenario desbalanceado. Se puede ver que no alcanza la cota inferior, por lo que requiere de más episodios de entrenamiento.
+En la [Figura 28](#MWTPerEpisode_b) podemos observar que para este escenario en particular, la curva de disminución del tiempo de espera promedio es un poco diferente a la del escenario desbalanceado. La pendiente de la curva disminuye notablemente durante los primeros 50 episodios y luego durante los siguientes 75 episodios la pendiente se acerca a 0, para luego disminuir nuevamente hasta el episodio final (episodio 200). 
+
+Como se puede observar en el [Diseño del Flujo de Tráfico](DiseniodelFlujoDeTrafico), el escenario balanceado muestra un flujo constante de vehículos durante cada episodio. Sin embargo, la cantidad de vehículos generados es mayor en comparación con el escenario desbalanceado. Se puede ver que no alcanza la cota inferior, por lo que requiere de más episodios de entrenamiento.
 
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="CRPerEpisode_B">
   <img src="./images/CRPerEpisode_B.png" alt="CRPerEpisode_B" width="800" height="auto">
-  <p><i>Figura 29:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 29:</i> Tiempo de espera promedio (en segundos) del agente Q-Learning, sobre un escenario balanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EEPerEpisode_B">
   <img src="./images/EEPerEpisode_B.png" alt="EEPerEpisode_B" width="800" height="auto">
-  <p><i>Figura 30:</i> Tiempo transcurrido del agente Q-Learning, sobre un escenario desbalanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
+  <p><i>Figura 30:</i> Tiempo transcurrido del agente Q-Learning, sobre un escenario balanceado. Se muestran la media con su desviación estándar sumada y restada para las 15 ejecuciones de entrenamiento.</p>
 </div>
 
 
@@ -782,8 +784,7 @@ Utilizando los mismos hiper-parámetros (a excepción de la función de recompen
   <p><i>Figura 32:</i> Recompensa acumulada del agente Q-Learning, usando <i>diff_cumulativeWaitingTime</i> como función de recompensa, sobre un escenario desbalanceado.</p>
 </div>
 
-Haciendo uso de esta función de recompensa podemos observar más claramente como el agente incremente su recompensa acumulada a través de los episodios, como muestra la [Figura 33](#EE_QA_DiffCWT). Vemos como se comienza a acercar al 0 (máxima recompensa acumulada posible) y oscila cercano a este, a partir del episodio 50. Hasta estabilizar notablemente la recompensa acumulada en los episodios finales. Es posible ver como repercute esta métrica en la métrica del tiempo de espera promedio en la [Figura 31](#MWT_QA_DiffCWT). Las pendientes de ambas métricas crecen en magnitud de formas similares (pero con signo opuesto).
-
+Haciendo uso de esta función de recompensa podemos observar más claramente como el agente incremente su recompensa acumulada a través de los episodios, como muestra la [Figura 32](#EE_QA_DiffCWT). Vemos como se comienza a acercar al 0 (máxima recompensa acumulada posible) y oscila cercano a este, a partir del episodio 50. Hasta estabilizar notablemente la recompensa acumulada en los episodios finales. Viendo ambas figuras, es posible ver como la recompensa acumulada [Figura 32](#EE_QA_DiffCWT) repercute en el tiempo de espera promedio ([Figura 31](#MWT_QA_DiffCWT)) . Las pendientes de ambas métricas crecen en magnitud de formas similares (pero con signo opuesto).
 
 <div style="display: flex; flex-direction: column; align-items: center; text-align: center;" id="EE_QA_DiffCWT">
   <img src="./images/EE_QA_DiffCWT.png" alt="EE_QA_DiffCWT" width="800" height="auto">
@@ -791,7 +792,7 @@ Haciendo uso de esta función de recompensa podemos observar más claramente com
 </div>
 
 
-De forma análoga al otro agente propuesto, ocurre algo similar con el tiempo transcurrido: disminuye cuando mejor se gestiona el tráfico. Sin embargo, los tiempos de espera en este agente son mucho mayor, lo cual relentiza el proceso de aprendizaje.
+De forma análoga al otro agente propuesto,  y como se observa en la [Figura 33](#EE_QA_DiffCWT), ocurre algo similar con el tiempo transcurrido: disminuye cuando mejor se gestiona el tráfico. Sin embargo, los tiempos de espera en este agente son mucho mayor, lo cual relentiza el proceso de aprendizaje.
 
 
 ### Comparación con baseline
