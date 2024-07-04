@@ -110,7 +110,7 @@ A medida que se avanza en los episodios de entrenamiento del agente, el valor de
 
 ### Terminología utilizada
 
-A continuación se daran las definiciones de terminología importante a la hora de explicar la solución propuesta y discutir los resultados. Todas las definiciones incluidas fueron extraídas de la presentación realizada por Hua Wei, Zhenhui Li, Vikash Gayah en IEEE ITSC‘20 Tutorial [[9]](#ref9), y de la documentación de SUMO [[3]](#ref3).
+A continuación se daran las definiciones de terminología importante a la hora de explicar la solución propuesta y discutir los resultados. Todas las definiciones incluidas fueron extraídas de la presentación realizada por Hua Wei, Zhenhui Li, Vikash Gayah en IEEE ITSC‘20 Tutorial [[8]](#ref8), y de la documentación de SUMO [[3]](#ref3).
 
 **Carril** (*lane*): Una intersección está compuesta por una conjunto de carriles. Hay dos tipos de carriles: carriles entrantes y carriles salientes. Como se muestra en la [Figura 3](#intersectionElements).
 
@@ -153,7 +153,7 @@ A continuación se daran las definiciones de terminología importante a la hora 
 ## Metodología y Diseño Experimental
 Nuestro objetivo principal es maximizar la recompensa definida, lo cual producirá una reducción en los tiempos de espera de los vehículos simulados y una gestión de tráfico eficiente para un entorno dinámico. De forma secundaria, también nos interesa que los tiempos de ejecución no sean muy altos. Por lo tanto, los parámetros de nuestro agente deben satisfacer los dos objetivos.
 
-Una ayuda importante para la estructura e implementación del proyecto ha sido el repositorio encontrado en la web del projecto SUMO-RL de Lucas N. Alegre [[8]](#ref8). El cual ha servido de guía para el cálculo de una de las funciones de recompensa utilizadas y, junto a los tutoriales de SUMO [[2]](#ref2), comprender la forma de interactuar con la simulación.
+Una ayuda importante para la estructura e implementación del proyecto ha sido el repositorio encontrado en la web del projecto SUMO-RL de Lucas N. Alegre [[7]](#ref7). El cual ha servido de guía para el cálculo de una de las funciones de recompensa utilizadas y, junto a los tutoriales de SUMO [[2]](#ref2), comprender la forma de interactuar con la simulación.
 
 ### Entorno
 
@@ -424,7 +424,7 @@ Tanto para la función de recompensa mediante la diferencia en el tiempo de espe
 En la sección de [Diseño del Flujo de Tráfico](#DiseniodelFlujoDeTrafico), se diseñaron los escenarios de forma tal que se disminuya un poco este comportamiento. Sin embargo este fénomeno perjudica a la interpretabilidad de la recompensa acumulada a lo largo de los episodios, como se puede observar en los resultados.
 
 #### Recompensa: Cambio en los tiempos de espera acumulados
-Debido a la observación anterior se propone una tercera función de recompensa, utilizada en el trabajo de Liang, X. et al. (2019) [[4]](#ref4) e incluida en el repositorio de Lucas N. Alegre [[8]](#ref8), que permite visualizar la evolución de la recompensa acumulada. Esta se calcula con el **cambio en los tiempos de espera acumulados** entre el paso de tiempo actual y el anterior.
+Debido a la observación anterior se propone una tercera función de recompensa, utilizada en el trabajo de Liang, X. et al. (2019) [[4]](#ref4) e incluida en el repositorio de Lucas N. Alegre [[7]](#ref7), que permite visualizar la evolución de la recompensa acumulada. Esta se calcula con el **cambio en los tiempos de espera acumulados** entre el paso de tiempo actual y el anterior.
 
 Sea $t$ el instante de tiempo actual, $L$ la cantidad de carriles (o calles), $N_l$ la cantidad de vehículos en el carril $l$, y $cw_{l_i}$ el tiempo de espera acumulado del vehículo $i$ en el carril $l$ en el instante $t$. $CW_t$ es el tiempo acumulado total de espera en el instante $t$, definido como:
 
@@ -809,7 +809,7 @@ Con el objetivo de mejorar la gestión del tráfico mediante semáforos, se prop
 
 El otro componente esencial del *Reinforcement Learning* es el agente, el cual debe aprender una política óptima para gestionar las fases de un semáforo en una intersección. Esta política se ejecuta basándose en los valores acción-estado (Q-values) estimados durante el entrenamiento, siguiendo el algoritmo **Q-learning**. Para evitar que el agente se quede atrapado en óptimos locales y busque mejores soluciones, se utilizó una estrategia epsilon-greedy durante el entrenamiento.
 
-De forma empírica y semi-arbitraria, se determinaron los hiperparámetros más relevantes para ajustarlos y lograr un mejor rendimiento del sistema. Se exploraron valores para estos hiperparámetros que maximizaran las recompensas obtenidas sin requerir un gran tiempo de cómputo, debido a las limitaciones de hardware y la poca escalabilidad inherente al método tabular Q-learning. La función de recompensa utilizada por el sistema es parametrizable y resulta crucial que esté bien definida para lograr un aprendizaje efectivo. La mejor candidata fué la diferencia de tiempos de espera entre pasos de tiempo consecutivos. Posteriormente, se propuso una alternativa ligeramente superior, aunque más demandante en términos de cómputo: la diferencia entre tiempos de espera acumulados entre pasos de tiempo consecutivos.
+De forma empírica y semi-arbitraria, se determinaron los hiperparámetros más relevantes para ajustarlos y lograr un mejor rendimiento del sistema. Se exploraron valores para estos hiperparámetros que maximizaran las recompensas obtenidas sin requerir un gran tiempo de cómputo, debido a las limitaciones de hardware y la poca escalabilidad inherente al método tabular Q-learning. La función de recompensa utilizada por el sistema es parametrizable y resulta crucial que esté bien definida para lograr un aprendizaje efectivo. En un principio, la mejor candidata fué la diferencia de tiempos de espera entre pasos de tiempo consecutivos. Posteriormente, se propuso una alternativa ligeramente superior, aunque más demandante en términos de cómputo: la diferencia entre tiempos de espera acumulados entre pasos de tiempo consecutivos.
 
 Finalmente, se entrenó al agente en los escenarios de tráfico planteados, utilizando las dos funciones de recompensa mencionadas. El agente Q-learning logró aprender una política que mejoró notablemente el rendimiento en todas las métricas planteadas. Tanto en el escenario balanceado como en el desbalanceado, y utilizando las dos funciones de recompensa, se logró una mejoría respecto al sistema de referencia, que consiste en un semáforo tradicional (de tiempos fijos) de dos fases. Los resultados muestran que se cumplieron las expectativas de la solución propuesta, reduciendo los tiempos de espera de los vehículos y, en consecuencia, las congestiones.
 
@@ -845,12 +845,10 @@ Para mejorar el rendimiento y la escalabilidad de nuestro sistema, se invita a i
 <div id="ref6"></div>
 
 6. Wei, H. et al. (2019) A survey on traffic signal control methods. https://arxiv.org/abs/1904.08117.
+
 <div id="ref7"></div>
 
-7. Bálint, K., Tamás, T. and Tamás, B. (2022) 'Deep Reinforcement Learning based approach for Traffic Signal Control,' Transportation Research Procedia, 62, pp. 278–285. https://doi.org/10.1016/j.trpro.2022.02.035.
+7. Lucas N. Alegre - SUMO-RL 1.4.5 documentation. https://lucasalegre.github.io/sumo-rl/.
 <div id="ref8"></div>
 
-8. Lucas N. Alegre - SUMO-RL 1.4.5 documentation. https://lucasalegre.github.io/sumo-rl/.
-<div id="ref9"></div>
-
-9. Hua Wei, Zhenhui Li, Vikash Gayah (2020) IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides) https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p
+8. Hua Wei, Zhenhui Li, Vikash Gayah (2020) IEEE ITSC‘20 Tutorial - Deep Reinforcement Learning for Traffic Signal Control (slides) https://docs.google.com/presentation/d/12cqabQ_V5Q9Y2DpQOdpsHyrR6MIxy1CJlPmUE3Ojr8o/edit#slide=id.p
